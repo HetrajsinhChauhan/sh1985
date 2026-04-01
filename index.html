@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap"
         rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,16 +18,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <style>
-        /* --- 60-30-10 Color Variables --- */
+        /* --- UPDATED PREMIUM COLOR PALETTE --- */
         :root {
-            --beige-60: #F4F1EA;
-            /* 60% Backgrounds */
-            --maroon-30: #6B2737;
-            /* 30% Text, Overlays, Blocks */
-            --gold-10: #D4AF37;
-            /* 10% Accents, Lines, Highlights */
+            --beige-60: #F9F6F0;
+            /* Cleaner, luxurious Alabaster */
+            --maroon-30: #4A1C24;
+            /* Deeper, richer Burgundy */
+            --gold-10: #C5A059;
+            /* Refined Champagne Gold */
             --white: #FFFFFF;
-            --black: #111111;
+            --black: #0A0A0A;
         }
 
         * {
@@ -52,9 +52,18 @@
             font-family: 'Playfair Display', serif;
         }
 
+        /* Elegant Italics for Headers */
+        h1 i,
+        h2 i,
+        .serif i {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--gold-10);
+        }
+
         /* --- Custom Scrollbar --- */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
@@ -62,8 +71,65 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--maroon-30);
-            border-radius: 4px;
+            background: var(--gold-10);
+            border-radius: 3px;
+        }
+
+        /* --- PRELOADER & CINEMATIC TEXT --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #cinematic-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5.5rem;
+            color: var(--beige-60);
+            z-index: 10001;
+            pointer-events: none;
+            white-space: nowrap;
+            font-weight: 400;
+        }
+
+        #cinematic-text span {
+            color: var(--gold-10);
+            font-style: italic;
+        }
+
+        .loader-content {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            text-align: center;
+        }
+
+        .loader-line-wrapper {
+            width: 300px;
+            height: 1px;
+            background: rgba(244, 241, 234, 0.15);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .loader-line {
+            width: 0%;
+            height: 100%;
+            background: var(--gold-10);
         }
 
         /* --- Navigation --- */
@@ -75,19 +141,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 4rem;
+            padding: 2rem 4rem;
             z-index: 1000;
-            background: rgba(244, 241, 234, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(107, 39, 55, 0.1);
-            transition: all 0.4s ease;
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        nav .logo,
+        nav .nav-links a,
+        nav .nav-icons i,
+        nav .auth-links a {
+            color: var(--beige-60);
         }
 
         .logo {
-            font-size: 2.2rem;
-            color: var(--maroon-30);
+            font-size: 2rem;
             text-decoration: none;
             font-weight: 500;
+            opacity: 0;
+            letter-spacing: 1px;
         }
 
         .logo span {
@@ -98,37 +171,68 @@
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 3rem;
+            gap: 3.5rem;
         }
 
         .nav-links a {
             text-decoration: none;
-            color: var(--maroon-30);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: color 0.3s ease;
+            letter-spacing: 3px;
+            transition: color 0.4s ease;
         }
 
         .nav-links a:hover {
-            color: var(--gold-10);
+            color: var(--gold-10) !important;
         }
 
         .nav-icons {
             display: flex;
-            gap: 1.5rem;
+            align-items: center;
+            gap: 2rem;
         }
 
         .nav-icons i {
-            color: var(--maroon-30);
             cursor: pointer;
-            font-size: 1.2rem;
-            transition: color 0.3s ease;
+            font-size: 1.1rem;
+            transition: color 0.4s ease;
         }
 
         .nav-icons i:hover {
-            color: var(--gold-10);
+            color: var(--gold-10) !important;
+        }
+
+        .auth-links {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+            margin-right: 1.5rem;
+        }
+
+        .auth-links a {
+            text-decoration: none;
+            transition: color 0.4s ease;
+        }
+
+        .auth-links a:hover {
+            color: var(--gold-10) !important;
+        }
+
+        nav.nav-scrolled {
+            background: rgba(249, 246, 240, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 1.2rem 4rem;
+            border-bottom: 1px solid rgba(74, 28, 36, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        nav.nav-scrolled .logo,
+        nav.nav-scrolled .nav-links a,
+        nav.nav-scrolled .nav-icons i,
+        nav.nav-scrolled .auth-links a {
+            color: var(--maroon-30);
         }
 
         /* --- Buttons --- */
@@ -141,6 +245,7 @@
             letter-spacing: 2px;
             transition: all 0.3s ease;
             cursor: pointer;
+            border: none;
         }
 
         .btn-gold {
@@ -164,50 +269,270 @@
             color: var(--white);
         }
 
-        /* --- Hero Section --- */
+        .w-100 {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* =========================================================
+           --- NEW EDITORIAL HERO SLIDER --- 
+           ========================================================= */
         .hero {
             position: relative;
             height: 100vh;
             width: 100vw;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
             background-color: var(--black);
         }
 
-        .hero-img {
+        /* Elegant Thin Frame Inside Hero */
+        .hero-frame {
+            position: absolute;
+            inset: 1.5rem;
+            border: 1px solid rgba(197, 160, 89, 0.25);
+            /* Subtle gold */
+            pointer-events: none;
+            z-index: 15;
+            border-bottom: none;
+            /* Let the bottom breathe */
+        }
+
+        .slide {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=1920&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.6;
+            display: flex;
+            opacity: 0;
+            visibility: hidden;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
+        .slide.slide-active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 1;
+        }
+
+        .hero-img-wrap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.1);
+            /* Starts zoomed in for Ken Burns effect */
+        }
+
+        /* Rich Premium Gradient Overlay */
+        .hero-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, rgba(74, 28, 36, 0.3) 50%, rgba(10, 10, 10, 0.4) 100%);
+        }
+
+        /* Asymmetrical Editorial Layout */
+        .hero-content-editorial {
+            position: absolute;
+            bottom: 8%;
+            left: 4rem;
+            right: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 20;
             color: var(--beige-60);
         }
 
-        .hero-content h1 {
-            font-size: 6rem;
-            font-weight: 400;
-            letter-spacing: 5px;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
+        /* Title Wrapping for Mask Reveal */
+        .hero-title-wrapper {
+            overflow: hidden;
+            padding-bottom: 10px;
         }
 
-        .hero-content p {
-            font-size: 1.2rem;
+        .gs-hero-title {
+            font-size: 7vw;
+            font-weight: 300;
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transform: translateY(100%);
+            /* Hidden state for GSAP */
+        }
+
+        .hero-meta {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 1.5rem;
+        }
+
+        .gs-hero-sub {
+            font-size: 0.8rem;
             letter-spacing: 4px;
-            margin-bottom: 2.5rem;
+            text-transform: uppercase;
             color: var(--gold-10);
+        }
+
+        /* Elegant Text Button */
+        .btn-text {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: color 0.3s;
+        }
+
+        .btn-text i {
+            font-size: 1rem;
+            color: var(--gold-10);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-text:hover {
+            color: var(--gold-10);
+        }
+
+        .btn-text:hover i {
+            transform: translateX(10px);
+        }
+
+        .slider-arrows {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 20;
+        }
+
+        .slider-arrow {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .slider-arrow:hover {
+            background: var(--gold-10);
+            border-color: var(--gold-10);
+            color: var(--black);
+            transform: scale(1.1);
+        }
+
+        /* --- Login / Register Modals --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-box {
+            background: var(--beige-60);
+            padding: 4rem 3rem;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            display: none;
+            border-top: 4px solid var(--gold-10);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            color: var(--maroon-30);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--gold-10);
+        }
+
+        .modal-box h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            color: var(--maroon-30);
+            margin-bottom: 2.5rem;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: transparent;
+            border: 1px solid rgba(74, 28, 36, 0.2);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: var(--maroon-30);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--gold-10);
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(74, 28, 36, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.7rem;
+        }
+
+        .modal-footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+        }
+
+        .modal-footer a {
+            color: var(--gold-10);
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-footer a:hover {
+            color: var(--maroon-30);
         }
 
         /* --- Section 1: Clean Editorial Categories --- */
@@ -360,7 +685,180 @@
             grid-row: 2;
         }
 
-        /* --- NEW SECTION: Heritage / Storytelling --- */
+        /* --- NEW SECTION: Horizontal Scroll Showcase --- */
+        .horizontal-showcase {
+            background: var(--maroon-30);
+            color: var(--beige-60);
+            padding: 8rem 0;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .hs-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 0 4rem;
+        }
+
+        .hs-header h2 {
+            font-size: 4rem;
+            color: var(--gold-10);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .hs-header p {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .hs-container {
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .hs-wrapper {
+            display: flex;
+            width: max-content;
+            padding: 0 4rem;
+            gap: 4rem;
+        }
+
+        .hs-item {
+            width: 450px;
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .hs-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+
+        .hs-item:hover img {
+            transform: scale(1.08);
+        }
+
+        .hs-item-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 3rem 2rem 2rem 2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            color: var(--white);
+        }
+
+        .hs-item-text h3 {
+            font-size: 1.8rem;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 0.5rem;
+            color: var(--gold-10);
+            letter-spacing: 2px;
+        }
+
+        .hs-item-text p {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- NEW SECTION: Masonry Categories --- */
+        .masonry-section {
+            padding: 10rem 4rem;
+            background: var(--beige-60);
+        }
+
+        .masonry-header {
+            margin-bottom: 5rem;
+            text-align: center;
+        }
+
+        .masonry-header h2 {
+            font-size: 4rem;
+            color: var(--maroon-30);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 300px;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .m-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(107, 39, 55, 0.1);
+        }
+
+        .m-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .m-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .m-tall {
+            grid-row: span 2;
+            grid-column: span 2;
+        }
+
+        .m-wide {
+            grid-column: span 2;
+        }
+
+        .m-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(74, 28, 36, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .m-item:hover .m-overlay {
+            opacity: 1;
+        }
+
+        .m-overlay span {
+            color: var(--white);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-style: italic;
+            border-bottom: 1px solid var(--gold-10);
+            padding-bottom: 0.5rem;
+            transform: translateY(20px);
+            transition: transform 0.5s ease;
+        }
+
+        .m-item:hover .m-overlay span {
+            transform: translateY(0);
+        }
+
+        /* --- Section 3: Heritage Storytelling --- */
         .heritage-section {
             padding: 10rem 4rem;
             background: var(--white);
@@ -434,7 +932,7 @@
             padding-left: 1.5rem;
         }
 
-        /* --- NEW SECTION: Parallax Full Width Banner --- */
+        /* --- Section 4: Parallax Banner --- */
         .parallax-banner {
             position: relative;
             width: 100vw;
@@ -456,8 +954,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(107, 39, 55, 0.7);
-            /* Maroon 30% overlay */
+            background: rgba(74, 28, 36, 0.75);
         }
 
         .parallax-content {
@@ -482,7 +979,7 @@
             text-transform: uppercase;
         }
 
-        /* --- Section 3: Timeline / Anatomy Layout --- */
+        /* --- Section 5: Timeline / Anatomy Layout --- */
         .anatomy-section {
             background: var(--white);
             padding: 10rem 4rem;
@@ -498,7 +995,7 @@
             left: -10%;
             width: 120%;
             height: 100%;
-            background: linear-gradient(to bottom right, transparent 40%, rgba(212, 175, 55, 0.05) 40%, rgba(212, 175, 55, 0.05) 60%, transparent 60%);
+            background: linear-gradient(to bottom right, transparent 40%, rgba(197, 160, 89, 0.05) 40%, rgba(197, 160, 89, 0.05) 60%, transparent 60%);
             z-index: 1;
             pointer-events: none;
         }
@@ -515,7 +1012,7 @@
             color: var(--maroon-30);
             text-transform: uppercase;
             letter-spacing: 8px;
-            opacity: 0.1;
+            opacity: 0.05;
             position: absolute;
             top: 0;
             left: 50%;
@@ -524,7 +1021,7 @@
         }
 
         .anatomy-header h3 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-top: 2rem;
             color: var(--gold-10);
         }
@@ -561,17 +1058,18 @@
 
         .specs div {
             margin-bottom: 1rem;
+            color: var(--maroon-30);
         }
 
         .specs span {
             display: block;
             color: var(--gold-10);
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-family: 'Playfair Display', serif;
         }
 
-        /* --- Section 4: Structured Services Grid --- */
+        /* --- Section 6: Structured Services Grid --- */
         .services-section {
             padding: 8rem 4rem;
             background-color: var(--maroon-30);
@@ -597,17 +1095,17 @@
         }
 
         .service-card {
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            border: 1px solid rgba(197, 160, 89, 0.2);
             padding: 4rem 2rem;
             text-align: center;
-            transition: all 0.4s ease;
-            background: rgba(0, 0, 0, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 0, 0, 0.15);
         }
 
         .service-card:hover {
             border-color: var(--gold-10);
             transform: translateY(-10px);
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .service-card i {
@@ -631,7 +1129,7 @@
             margin-bottom: 2rem;
         }
 
-        /* --- NEW SECTION: Testimonials / Client Success --- */
+        /* --- Section 7: Testimonials --- */
         .testimonial-section {
             padding: 8rem 4rem;
             background: var(--beige-60);
@@ -727,10 +1225,11 @@
         .link-column a {
             text-decoration: none;
             color: var(--maroon-30);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: color 0.3s;
+            font-weight: 500;
         }
 
         .link-column a:hover {
@@ -740,15 +1239,26 @@
         .footer-bottom {
             text-align: center;
             padding-top: 2rem;
-            border-top: 1px solid rgba(107, 39, 55, 0.1);
-            font-size: 0.8rem;
+            border-top: 1px solid rgba(74, 28, 36, 0.1);
+            font-size: 0.75rem;
             letter-spacing: 1px;
             text-transform: uppercase;
+            color: var(--maroon-30);
         }
     </style>
 </head>
 
 <body>
+
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-line-wrapper">
+                <div class="loader-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 id="cinematic-text" class="serif">Shagun <span>Ratna</span></h2>
 
     <nav class="nav-bar">
         <a href="#" class="logo serif">Shagun <span>Ratna</span></a>
@@ -759,18 +1269,74 @@
             <li><a href="#">Our Heritage</a></li>
         </ul>
         <div class="nav-icons">
+            <span class="auth-links">
+                <a href="#" id="openLoginBtn">Login</a> /
+                <a href="#" id="openRegBtn">Register</a>
+            </span>
             <i class="fas fa-search"></i>
             <i class="far fa-heart"></i>
             <i class="fas fa-shopping-bag"></i>
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="hero-img gs-hero-img"></div>
-        <div class="hero-content">
-            <h1 class="gs-hero-text">Rare Elegance</h1>
-            <p class="gs-hero-text">THE 2026 GEMSTONE COLLECTION</p>
-            <a href="#" class="btn btn-gold gs-hero-text">Enter the Vault</a>
+    <section class="hero" id="heroSlider">
+        <div class="hero-frame"></div>
+        <div class="slide slide-active">
+            <div class="hero-img-wrap">
+                <div class="hero-img"
+                    style="background-image: url('https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=1920&auto=format&fit=crop');">
+                </div>
+            </div>
+            <div class="hero-content-editorial">
+                <div class="hero-title-wrapper">
+                    <h1 class="gs-hero-title serif">Rare<br><i>Elegance</i></h1>
+                </div>
+                <div class="hero-meta">
+                    <p class="gs-hero-sub">The 2026 Gemstone Collection</p>
+                    <a href="#" class="btn-text gs-hero-btn">Enter Vault <i class="fas fa-long-arrow-alt-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="hero-img-wrap">
+                <div class="hero-img"
+                    style="background-image: url('https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=1920&auto=format&fit=crop');">
+                </div>
+            </div>
+            <div class="hero-content-editorial">
+                <div class="hero-title-wrapper">
+                    <h1 class="gs-hero-title serif">Eternal<br><i>Craft</i></h1>
+                </div>
+                <div class="hero-meta">
+                    <p class="gs-hero-sub">Masterpieces of Nature</p>
+                    <a href="#" class="btn-text gs-hero-btn">Discover More <i
+                            class="fas fa-long-arrow-alt-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="hero-img-wrap">
+                <div class="hero-img"
+                    style="background-image: url('https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=1920&auto=format&fit=crop');">
+                </div>
+            </div>
+            <div class="hero-content-editorial">
+                <div class="hero-title-wrapper">
+                    <h1 class="gs-hero-title serif">Flawless<br><i>Cuts</i></h1>
+                </div>
+                <div class="hero-meta">
+                    <p class="gs-hero-sub">Ethically Sourced Diamonds</p>
+                    <a href="#" class="btn-text gs-hero-btn">View Showroom <i
+                            class="fas fa-long-arrow-alt-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-arrows">
+            <div class="slider-arrow" id="prevSlide"><i class="fas fa-chevron-left"></i></div>
+            <div class="slider-arrow" id="nextSlide"><i class="fas fa-chevron-right"></i></div>
         </div>
     </section>
 
@@ -778,7 +1344,7 @@
         <div class="ed-left">
             <p style="text-transform: uppercase; letter-spacing: 3px; color: var(--gold-10); margin-bottom: 10px;"
                 class="gs-rev">Curated Perfection</p>
-            <h2 class="gs-rev">Masterpieces<br>of Nature</h2>
+            <h2 class="gs-rev serif">Masterpieces<br><i>of Nature</i></h2>
             <ul class="category-list">
                 <li class="gs-rev"><a href="#">Bracelets</a></li>
                 <li class="gs-rev"><a href="#">Solitaire Rings</a></li>
@@ -794,7 +1360,7 @@
 
     <section class="diamond-section">
         <div class="diamond-text">
-            <h2 class="gs-rev">Piercings & <br>Ear Cuffs</h2>
+            <h2 class="gs-rev serif">Piercings & <br><i>Ear Cuffs</i></h2>
             <p class="gs-rev">Discover the perfect match. Our artisan-crafted ear jewelry combines modern edge with
                 timeless gemstone brilliance. Designed for the bold.</p>
             <a href="#" class="btn btn-outline gs-rev">Shop Collection</a>
@@ -815,6 +1381,85 @@
         </div>
     </section>
 
+    <section class="horizontal-showcase" id="horizontalShowcase">
+        <div class="hs-header">
+            <h2 class="serif gs-rev">The Master <i>Collection</i></h2>
+            <p class="gs-rev">Scroll to explore our finest creations</p>
+        </div>
+        <div class="hs-container">
+            <div class="hs-wrapper" id="hsWrapper">
+                <div class="hs-item"><img
+                        src="https://images.unsplash.com/photo-1605100804763-247f6612d544?q=80&w=600&auto=format&fit=crop"
+                        alt="Jewelry">
+                    <div class="hs-item-text">
+                        <h3 class="serif"><i>Solitaire</i> Rings</h3>
+                        <p>Starting at $2,000</p>
+                    </div>
+                </div>
+                <div class="hs-item"><img
+                        src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=600&auto=format&fit=crop"
+                        alt="Jewelry">
+                    <div class="hs-item-text">
+                        <h3 class="serif"><i>Tennis</i> Bracelets</h3>
+                        <p>Starting at $4,500</p>
+                    </div>
+                </div>
+                <div class="hs-item"><img
+                        src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop"
+                        alt="Jewelry">
+                    <div class="hs-item-text">
+                        <h3 class="serif"><i>Drop</i> Earrings</h3>
+                        <p>Starting at $1,800</p>
+                    </div>
+                </div>
+                <div class="hs-item"><img
+                        src="https://images.unsplash.com/photo-1599643478514-4a820cbf311e?q=80&w=600&auto=format&fit=crop"
+                        alt="Jewelry">
+                    <div class="hs-item-text">
+                        <h3 class="serif"><i>Pendant</i> Necklaces</h3>
+                        <p>Starting at $3,200</p>
+                    </div>
+                </div>
+                <div class="hs-item"><img
+                        src="https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?q=80&w=600&auto=format&fit=crop"
+                        alt="Jewelry">
+                    <div class="hs-item-text">
+                        <h3 class="serif"><i>Estate</i> Vintage</h3>
+                        <p>Price on Request</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="masonry-section">
+        <div class="masonry-header">
+            <h2 class="serif gs-rev">Curated <i>Categories</i></h2>
+        </div>
+        <div class="masonry-grid">
+            <div class="m-item m-tall gs-m-item">
+                <img src="https://images.unsplash.com/photo-1599643478514-4a820cbf311e?q=80&w=800&auto=format&fit=crop"
+                    alt="Necklaces">
+                <div class="m-overlay"><span>Necklaces</span></div>
+            </div>
+            <div class="m-item gs-m-item">
+                <img src="https://images.unsplash.com/photo-1605100804763-247f6612d544?q=80&w=600&auto=format&fit=crop"
+                    alt="Rings">
+                <div class="m-overlay"><span>Rings</span></div>
+            </div>
+            <div class="m-item gs-m-item">
+                <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=600&auto=format&fit=crop"
+                    alt="Bracelets">
+                <div class="m-overlay"><span>Bracelets</span></div>
+            </div>
+            <div class="m-item m-wide gs-m-item">
+                <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=800&auto=format&fit=crop"
+                    alt="Earrings">
+                <div class="m-overlay"><span>Earrings</span></div>
+            </div>
+        </div>
+    </section>
+
     <section class="heritage-section">
         <div class="heritage-images">
             <img src="https://images.unsplash.com/photo-1563403310-721665a50787?q=80&w=600&auto=format&fit=crop"
@@ -824,7 +1469,7 @@
         </div>
         <div class="heritage-text">
             <h4 class="gs-rev">Generations of Craft</h4>
-            <h2 class="serif gs-rev">The Shagun Ratna Legacy</h2>
+            <h2 class="serif gs-rev">The Shagun Ratna <i>Legacy</i></h2>
             <p class="gs-rev">For over three generations, Shagun Ratna has traveled the globe seeking the most
                 extraordinary stones hidden deep within the earth. Our commitment to ethical sourcing and flawless
                 lapidary work ensures every piece holds eternal value.</p>
@@ -834,7 +1479,7 @@
 
     <section class="parallax-banner">
         <div class="parallax-content">
-            <h2 class="serif gs-parallax-scale">Uncompromising Brilliance</h2>
+            <h2 class="serif gs-parallax-scale">Uncompromising <i>Brilliance</i></h2>
             <p class="gs-rev">Experience the pinnacle of high jewelry</p>
         </div>
     </section>
@@ -843,7 +1488,7 @@
         <div class="anatomy-content">
             <div class="anatomy-header">
                 <h2>MASTERPIECE</h2>
-                <h3 class="serif gs-rev">The Royal Solitaire</h3>
+                <h3 class="serif gs-rev">The Royal <i>Solitaire</i></h3>
                 <p style="margin-top: 1rem; letter-spacing: 2px; text-transform: uppercase;" class="gs-rev">Anatomy of
                     Brilliance</p>
             </div>
@@ -872,7 +1517,7 @@
     </section>
 
     <section class="services-section">
-        <h2 class="serif gs-rev">Bespoke Services</h2>
+        <h2 class="serif gs-rev">Bespoke <i>Services</i></h2>
         <div class="services-grid">
             <div class="service-card gs-card">
                 <i class="fas fa-gem"></i>
@@ -896,7 +1541,7 @@
     </section>
 
     <section class="testimonial-section">
-        <h2 class="serif gs-rev">Client Success</h2>
+        <h2 class="serif gs-rev">Client <i>Success</i></h2>
         <div class="testi-grid">
             <div class="testi-card gs-rev">
                 <i class="fas fa-quote-left"></i>
@@ -940,125 +1585,286 @@
         <div class="footer-bottom">© 2026 Shagun Ratna Gemstones. All Rights Reserved.</div>
     </footer>
 
+    <div class="modal-overlay" id="authOverlay">
+
+        <div class="modal-box" id="loginBox">
+            <i class="fas fa-times close-modal"></i>
+            <h2 class="serif">Welcome Back</h2>
+            <form>
+                <div class="form-group">
+                    <input type="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" required>
+                </div>
+                <button type="button" class="btn btn-gold w-100">Sign In</button>
+                <div class="modal-footer">
+                    <p>Don't have an account? <a href="#" id="switchToReg">Register here</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-box" id="regBox" style="display: none;">
+            <i class="fas fa-times close-modal"></i>
+            <h2 class="serif">Join Shagun Ratna</h2>
+            <form>
+                <div class="form-group">
+                    <input type="text" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Create Password" required>
+                </div>
+                <button type="button" class="btn btn-gold w-100">Create Account</button>
+                <div class="modal-footer">
+                    <p>Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             gsap.registerPlugin(ScrollTrigger);
 
-            // --- Navigation Shrink on Scroll ---
-            ScrollTrigger.create({
-                start: "top -80",
-                end: 99999,
-                toggleClass: { className: "nav-scrolled", targets: "nav" },
-                onUpdate: (self) => {
-                    const nav = document.querySelector('nav');
-                    if (self.isActive) {
-                        nav.style.padding = "1rem 4rem";
-                        nav.style.boxShadow = "0 5px 20px rgba(0,0,0,0.05)";
-                    } else {
-                        nav.style.padding = "1.5rem 4rem";
-                        nav.style.boxShadow = "none";
-                    }
+            // --- 1. PRELOADER & CINEMATIC TEXT ANIMATION ---
+
+            const tlLoader = gsap.timeline({
+                onComplete: () => {
+                    document.getElementById('preloader').style.display = 'none';
+                    // Start first slide Ken Burns immediately after load
+                    gsap.to(".slide-active .hero-img", { scale: 1, duration: 6, ease: "power1.out" });
                 }
             });
 
-            // --- Hero Entrance ---
-            const tlHero = gsap.timeline();
-            tlHero.from(".gs-hero-img", { scale: 1.1, duration: 2, ease: "power2.out" })
-                .from(".gs-hero-text", { y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=1.5");
+            // 1. Cinematic reveal of the large text
+            tlLoader.fromTo("#cinematic-text",
+                { opacity: 0, scale: 0.8, filter: "blur(20px)" },
+                { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power4.out" }
+            )
+                // 2. Load the line
+                .to(".loader-line", { width: "100%", duration: 1.5, ease: "power2.inOut" }, "-=1")
+                // 3. Fade out the loader line wrapper
+                .to(".loader-line-wrapper", { opacity: 0, duration: 0.5 })
+                // 4. Fade out the background to reveal the hero section
+                .to("#preloader", { opacity: 0, duration: 0.8, ease: "power2.inOut" })
+                // 5. Fly the massive text into the top left corner to become the logo
+                .to("#cinematic-text", {
+                    top: "2.8rem",
+                    left: "4rem",
+                    xPercent: 0,
+                    yPercent: -50,
+                    x: 0, y: 0,
+                    fontSize: "2rem",
+                    letterSpacing: "1px",
+                    duration: 1.5,
+                    ease: "power4.inOut",
+                    onComplete: () => {
+                        // Swap cinematic text for the actual logo in the DOM
+                        document.querySelector('.logo').style.opacity = 1;
+                        document.getElementById('cinematic-text').style.display = 'none';
+                    }
+                }, "-=0.8")
+                // 6. Mask Reveal the Hero Title
+                .fromTo(".slide-active .gs-hero-title",
+                    { yPercent: 100 },
+                    { yPercent: 0, duration: 1.5, ease: "expo.out" }, "-=1"
+                )
+                // 7. Fade in subtext and button
+                .fromTo(".slide-active .gs-hero-sub, .slide-active .gs-hero-btn",
+                    { opacity: 0, y: 20 },
+                    { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=1"
+                );
 
-            // --- Standard Fade/Slide up (REVERSE ON SCROLL UP) ---
+
+            // --- 2. Navigation Shrink & Solid Background on Scroll ---
+            ScrollTrigger.create({
+                start: "top -80",
+                end: 99999,
+                toggleClass: { className: "nav-scrolled", targets: "nav" }
+            });
+
+
+            // --- 3. Hero Image Slider Logic (Updated for Editorial Animations) ---
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            let isAnimating = false;
+
+            function changeSlide(direction) {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                const outSlide = slides[currentSlide];
+                currentSlide = (currentSlide + direction + slides.length) % slides.length;
+                const inSlide = slides[currentSlide];
+
+                const tl = gsap.timeline({
+                    onComplete: () => {
+                        outSlide.classList.remove('slide-active');
+                        inSlide.classList.add('slide-active');
+                        // Reset outSlide elements
+                        gsap.set(outSlide.querySelector('.gs-hero-title'), { yPercent: 100 });
+                        gsap.set(outSlide.querySelectorAll('.gs-hero-sub, .gs-hero-btn'), { opacity: 0, y: 20 });
+                        gsap.set(outSlide.querySelector('.hero-img'), { scale: 1.1 });
+                        isAnimating = false;
+                    }
+                });
+
+                tl.set(inSlide, { zIndex: 1, autoAlpha: 1 })
+                    .set(outSlide, { zIndex: 2 })
+                    // Crossfade
+                    .to(outSlide, { autoAlpha: 0, duration: 1.2, ease: "power2.inOut" })
+                    // Start Ken burns on incoming image
+                    .to(inSlide.querySelector('.hero-img'), { scale: 1, duration: 6, ease: "power1.out" }, 0)
+                    // Mask Reveal Title
+                    .fromTo(inSlide.querySelector('.gs-hero-title'),
+                        { yPercent: 100 },
+                        { yPercent: 0, duration: 1.5, ease: "expo.out" }, "-=0.8")
+                    // Fade Sub and Btn
+                    .fromTo(inSlide.querySelectorAll('.gs-hero-sub, .gs-hero-btn'),
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=1");
+            }
+
+            document.getElementById('nextSlide').addEventListener('click', () => changeSlide(1));
+            document.getElementById('prevSlide').addEventListener('click', () => changeSlide(-1));
+            setInterval(() => { if (!isAnimating) changeSlide(1); }, 7000);
+
+
+            // --- 4. Auth Modals Logic & Animations ---
+            const authOverlay = document.getElementById('authOverlay');
+            const loginBox = document.getElementById('loginBox');
+            const regBox = document.getElementById('regBox');
+
+            function openModal(boxToShow) {
+                authOverlay.style.display = 'flex';
+                loginBox.style.display = 'none';
+                regBox.style.display = 'none';
+                boxToShow.style.display = 'block';
+
+                gsap.fromTo(authOverlay, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                gsap.fromTo(boxToShow,
+                    { scale: 0.9, y: 30, opacity: 0 },
+                    { scale: 1, y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.2)", delay: 0.1 }
+                );
+            }
+
+            function switchModal(boxToHide, boxToShow) {
+                gsap.to(boxToHide, {
+                    scale: 0.95, opacity: 0, duration: 0.3, onComplete: () => {
+                        boxToHide.style.display = 'none';
+                        boxToShow.style.display = 'block';
+                        gsap.fromTo(boxToShow, { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power2.out" });
+                    }
+                });
+            }
+
+            function closeModal() {
+                gsap.to([loginBox, regBox], { scale: 0.95, y: 20, opacity: 0, duration: 0.3 });
+                gsap.to(authOverlay, {
+                    opacity: 0, duration: 0.3, delay: 0.1, onComplete: () => {
+                        authOverlay.style.display = 'none';
+                    }
+                });
+            }
+
+            document.getElementById('openLoginBtn').addEventListener('click', (e) => { e.preventDefault(); openModal(loginBox); });
+            document.getElementById('openRegBtn').addEventListener('click', (e) => { e.preventDefault(); openModal(regBox); });
+            document.getElementById('switchToReg').addEventListener('click', (e) => { e.preventDefault(); switchModal(loginBox, regBox); });
+            document.getElementById('switchToLogin').addEventListener('click', (e) => { e.preventDefault(); switchModal(regBox, loginBox); });
+            document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+            authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) closeModal(); });
+
+
+            // --- 5. Horizontal Scroll Section ---
+            const hsWrapper = document.getElementById("hsWrapper");
+            if (hsWrapper) {
+                gsap.to(hsWrapper, {
+                    x: () => -(hsWrapper.scrollWidth - window.innerWidth + 128),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: ".horizontal-showcase",
+                        pin: true,
+                        scrub: 1,
+                        start: "center center",
+                        end: () => "+=" + hsWrapper.scrollWidth
+                    }
+                });
+            }
+
+            // --- 6. ScrollTrigger Animations (Reverse on Scroll Up) ---
+
+            gsap.from(".gs-m-item", {
+                scrollTrigger: {
+                    trigger: ".masonry-grid", start: "top 80%",
+                    toggleActions: "play reverse play reverse"
+                },
+                y: 100, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power3.out"
+            });
+
             gsap.utils.toArray(".gs-rev").forEach(el => {
                 gsap.from(el, {
                     scrollTrigger: {
-                        trigger: el,
-                        start: "top 85%",
-                        toggleActions: "play reverse play reverse" // The magic line for reverse on scroll up
+                        trigger: el, start: "top 85%",
+                        toggleActions: "play reverse play reverse"
                     },
                     y: 40, opacity: 0, duration: 0.8, ease: "power2.out"
                 });
             });
 
-            // --- Image Scale Reveal ---
             gsap.from(".gs-img-scale img", {
                 scrollTrigger: {
-                    trigger: ".editorial-intro",
-                    start: "top 70%",
+                    trigger: ".editorial-intro", start: "top 70%",
                     toggleActions: "play reverse play reverse"
                 },
                 scale: 1.2, opacity: 0, duration: 1.2, ease: "power3.out"
             });
 
-            // --- Diamond Grid Animation ---
             gsap.from(".gs-diamond", {
                 scrollTrigger: {
-                    trigger: ".diamond-grid",
-                    start: "top 75%",
+                    trigger: ".diamond-grid", start: "top 75%",
                     toggleActions: "play reverse play reverse"
                 },
                 scale: 0.5, opacity: 0, duration: 0.8, stagger: 0.15, ease: "back.out(1.2)"
             });
 
-            // --- Heritage Parallax Image Scrub ---
             gsap.from(".gs-scrub-y", {
-                scrollTrigger: {
-                    trigger: ".heritage-section",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: 1
-                },
+                scrollTrigger: { trigger: ".heritage-section", start: "top bottom", end: "bottom top", scrub: 1 },
                 y: -100
             });
             gsap.from(".gs-scrub-y-fast", {
-                scrollTrigger: {
-                    trigger: ".heritage-section",
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: 1.5
-                },
+                scrollTrigger: { trigger: ".heritage-section", start: "top bottom", end: "bottom top", scrub: 1.5 },
                 y: -150
             });
 
-            // --- Parallax Banner Text Scale ---
             gsap.from(".gs-parallax-scale", {
                 scrollTrigger: {
-                    trigger: ".parallax-banner",
-                    start: "top 80%",
+                    trigger: ".parallax-banner", start: "top 80%",
                     toggleActions: "play reverse play reverse"
                 },
                 scale: 0.8, opacity: 0, duration: 1, ease: "power3.out"
             });
 
-            // --- Anatomy Parallax / Scrub ---
             gsap.utils.toArray(".gs-scrub-img").forEach(img => {
                 gsap.from(img, {
-                    scrollTrigger: {
-                        trigger: img,
-                        start: "top 90%",
-                        end: "bottom 20%",
-                        scrub: 1
-                    },
+                    scrollTrigger: { trigger: img, start: "top 90%", end: "bottom 20%", scrub: 1 },
                     y: 100, rotation: -15, opacity: 0.2
                 });
             });
 
             gsap.utils.toArray(".gs-scrub-text").forEach(text => {
                 gsap.from(text, {
-                    scrollTrigger: {
-                        trigger: text,
-                        start: "top 90%",
-                        end: "bottom 30%",
-                        scrub: 1
-                    },
-                    x: (i, el) => el.style.textAlign === "right" ? -50 : 50,
-                    opacity: 0
+                    scrollTrigger: { trigger: text, start: "top 90%", end: "bottom 30%", scrub: 1 },
+                    x: (i, el) => el.style.textAlign === "right" ? -50 : 50, opacity: 0
                 });
             });
 
-            // --- Services Cards ---
             gsap.from(".gs-card", {
                 scrollTrigger: {
-                    trigger: ".services-section",
-                    start: "top 75%",
+                    trigger: ".services-section", start: "top 75%",
                     toggleActions: "play reverse play reverse"
                 },
                 y: 50, opacity: 0, duration: 0.6, stagger: 0.2, ease: "power2.out"
