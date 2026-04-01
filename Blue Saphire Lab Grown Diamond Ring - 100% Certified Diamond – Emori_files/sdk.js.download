@@ -1,0 +1,1362 @@
+(function (window, document) {
+  const config = {
+    cdnUrl: "https://cdn.flowautomate.io",
+    apiUrl: "https://api-meera.flowautomate.com",
+    cmsUrl: "https://cms.flowautomate.io",
+    sdkUrl: "https://meera-sdk.flowautomate.com",
+    envRun: "prod",
+    QuickSearchUrl: "https://search-pro.flowautomate.com",
+  };
+
+  var ChatbotSDK = function (options) {
+    this.options = options || {};
+    this.siteId = "";
+    this.btnText = "Shop with AI";
+    this.token = localStorage.getItem("secure_token");
+    this.console = "direct";
+    this.search_query = "";
+    this.storeName = "";
+    this.storeColor = "";
+    this.nlsWidth = "full"; // Default to full width
+    this.init();
+  };
+
+  ChatbotSDK.prototype.init = function () {
+    this.injectCSS();
+    this.createOpenButton();
+    this.attachMessageListener();
+  };
+
+  // Initialize Google Analytics with GA measurement ID
+  ChatbotSDK.prototype.initializeGA = function (gaId) {
+    if (!gaId) return;
+
+    // Initialize dataLayer
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag('js', new Date());
+    window.gtag('config', gaId, {
+      'debug_mode': true
+    });
+
+    // Inject GA script tag
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+    document.head.appendChild(script);
+  };
+
+  // Inject a CSS link dynamically into the document head
+  ChatbotSDK.prototype.injectCSS = function () {
+    var cssLink = document.createElement("link");
+    cssLink.rel = "stylesheet";
+    var timestamp = new Date().getTime();
+    cssLink.href =
+      this.options.cssUrl ||
+      `${config.cdnUrl}/meera-sdk/${config.envRun}/sdkcss.css?v=${timestamp}`; // Default or custom CSS
+    document.head.appendChild(cssLink);
+  };
+
+  ChatbotSDK.prototype.createOpenButton = async function () {
+    try {
+      const response = await fetch(
+        `${config.apiUrl}/user/website/site-details?website_url=${window.location.origin}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Initialize Google Analytics if ga_measurement_id is present
+      if (data?.data?.ga_measurement_id) {
+        config.gaId = data.data.ga_measurement_id;
+        this.initializeGA(config.gaId);
+      }
+
+      // Detect device
+      const deviceType = window.innerWidth <= 640 ? "mobile" : "desktop";
+
+      // Get widget config for current device
+      const deviceWidgetConfig = data.data.widget_button?.[deviceType];
+
+      // Get widget type for this device
+      const widgetType = deviceWidgetConfig?.widget_type || "widget_1";
+
+      // Use the widget for this type
+      const widgetStyleConfig = deviceWidgetConfig.widgets?.[widgetType] || {};
+
+      const pinButtons = document.querySelectorAll(
+        ".product-pin-icon, .flowmate-app-pin-button",
+      );
+      this.siteId = data?.data?.website_id;
+      this.storeName = data?.data?.name;
+      this.storeColor = data?.data?.primary_color || "#2d6bc6";
+      this.nlsWidth = data?.data?.nls_width || "full";
+      // Subscription inactive OR assistant disabled
+      if (
+        data?.data?.subscription_status !== "active" ||
+        !data?.data?.assistant_enabled
+      ) {
+        // Hide pin buttons always in this case
+        pinButtons.forEach((el) => el.classList.add("hidden"));
+        const searchbtn = document.getElementById("f20a24_quick_sense");
+        if (searchbtn) {
+          searchbtn.style.display = "none";
+        }
+        return;
+      }
+
+      if (
+        !data?.data?.chat_enabled ||
+        data?.data?.assistant_mode !== "nls-compare-ai"
+      ) {
+        pinButtons.forEach((el) => el.classList.add("hidden"));
+        this.attachSearchButtonListener();
+        return;
+      }
+
+      pinButtons.forEach((el) => {
+        // el.classList.remove("hidden");
+        const pinConfig = data?.data?.pin_config;
+        // Example: placement & offset from config
+        const { placement, offset } = pinConfig;
+
+        // reset styles
+        el.style.top = "unset";
+        el.style.right = "unset";
+        el.style.bottom = "unset";
+        el.style.left = "unset";
+
+        if (placement.includes("top")) {
+          el.style.top = offset.top + "px";
+        }
+        if (placement.includes("bottom")) {
+          el.style.bottom = offset.bottom + "px";
+        }
+        if (placement.includes("left")) {
+          el.style.left = offset.left + "px";
+        }
+        if (placement.includes("right")) {
+          el.style.right = offset.right + "px";
+        }
+      });
+      const isInitial = sessionStorage.getItem("initial_visit");
+
+      if (!isInitial) {
+        // First visit
+        await fetch(`${config.apiUrl}/user/website/visitor`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            website_id: this.siteId,
+          }),
+        });
+
+        // Set flag so it doesn't happen again
+        sessionStorage.setItem("initial_visit", true);
+      }
+
+      const searchbtn = document.getElementById("f20a24_quick_sense");
+      if (searchbtn) {
+        searchbtn.style.display = "block";
+      }
+
+      this.widget_type = widgetType;
+
+      // Update chatbot options based on API response
+      const widgetStyle = {
+        icon: widgetStyleConfig?.button_icon,
+        img_height: widgetStyleConfig?.img_height || 22,
+        img_width: widgetStyleConfig?.img_width || 22,
+        buttonText: widgetStyleConfig?.button_text || "Shop with AI",
+        button_texts: widgetStyleConfig?.button_texts || ["Shop with AI"],
+        width: widgetStyleConfig?.width,
+        border_width: widgetStyleConfig?.border_width,
+        buttonColor: widgetStyleConfig?.button_color || "#000000",
+        textColor: widgetStyleConfig?.text_color || "#ffffff",
+        fontWeight: widgetStyleConfig?.font_weight || "500",
+        fontStyle: widgetStyleConfig?.font_style || "initial",
+        border_radius: widgetStyleConfig?.border_radius || 99,
+        border_primary_color:
+          widgetStyleConfig?.border_primary_color || "#000000",
+        border_secondary_color:
+          widgetStyleConfig?.border_secondary_color || "#000000",
+        border_color: widgetStyleConfig?.border_color || "#ccc",
+        tooltip: widgetStyleConfig?.tooltip ?? true,
+        tooltip_bg: widgetStyleConfig?.tooltip_bg || "#000000e6",
+        tooltip_color: widgetStyleConfig?.tooltip_color || "#ffffff",
+        tooltip_text:
+          widgetStyleConfig?.tooltip_text ||
+          "Hi, I'm Meera! <br> Your AI shopping assistant!",
+        tooltip_radius: widgetStyleConfig?.tooltip_radius || 10,
+        tooltip_border_width: widgetStyleConfig?.tooltip_border_width || 1,
+        tooltip_primary_color:
+          widgetStyleConfig?.tooltip_primary_color || "#000000",
+        tooltip_secondary_color:
+          widgetStyleConfig?.tooltip_secondary_color || "#000000",
+      };
+      this.btnText = widgetStyleConfig?.button_text || "Shop with AI";
+      this.btnTextColor = widgetStyleConfig?.text_color || "#ffffff";
+
+      var productCount = this.options.selectedProducts?.length || 0;
+      var buttonText =
+        this.options.layout === "multiple" && productCount > 0
+          ? `${widgetStyle.buttonText} (${productCount})`
+          : widgetStyle.buttonText;
+
+      var shortcode = document.getElementById("chatbot-shortcode");
+      if (shortcode) {
+        const positionStyles = widgetStyleConfig?.position || {};
+        const { offset = { bottom: 40, right: 40 } } = positionStyles;
+        var positionCSS = Object.entries(offset)
+          .map(([key, value]) => `${key}: ${value}px;`)
+          .join("\n");
+
+        var btncss = `
+              background-color: ${widgetStyle.buttonColor} !important;
+              color: ${widgetStyle.textColor} !important;
+              font-weight: ${widgetStyle.fontWeight} !important;
+              font-style: ${widgetStyle.fontStyle} !important;
+              border-radius: ${widgetStyle.border_radius}px !important;
+            `;
+
+        const tooltipPositionCSS = `
+          ${offset.bottom !== undefined ? `flex-direction: column;` : ""}
+          ${offset.top !== undefined ? `flex-direction: column-reverse;` : ""}
+          transition: opacity 0.3s ease-in-out;
+          ${
+            offset.left !== undefined
+              ? `align-items:start;`
+              : offset.right !== undefined
+                ? `align-items: end;`
+                : `align-items:start;`
+          }
+        `;
+        const dynamicCSS = `
+            .f20a24-button {
+              border-radius: ${
+                widgetStyle.border_radius
+              }px; /* Dynamic Border Radius */
+              position: relative;
+              box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+              display: inline-flex;
+              height: 48px;
+              padding: 2px;
+              // margin-left: auto;
+              overflow: hidden;
+              transition: transform 0.2s ease-in-out;
+              text-transform:none
+            }
+      
+            .f20a24-button::before {
+              content: "";
+              position: absolute;
+              inset: -1000%;
+              background: conic-gradient(from 90deg at 50% 50%, ${
+                widgetStyle.border_primary_color
+              } 50%, ${widgetStyle.border_secondary_color} 100%);
+              animation: spin 2s linear infinite;
+              z-index: 0;
+            }
+      
+            .f20a24-button-content {
+              display: inline-flex;
+              height: 100%;
+              width: 100%;
+              align-items: center;
+              justify-content: center;
+              border-radius: ${widgetStyle.border_radius}px;
+              font-size: 14px;
+              padding: 0 20px;
+              backdrop-filter: blur(12px);
+              gap: 8px;
+              position: relative;
+              z-index: 1; /* Ensures content stays above the animated border */
+              background: transparent; /* Keep button itself transparent */
+              color: ${widgetStyle.textColor} !important;
+              font-weight: ${widgetStyle.fontWeight};
+              font-style: ${widgetStyle.fontStyle};
+            }
+
+
+            // .tooltip-main {
+            // position:absolute;
+            //  transform: translateX(-50%);
+            //   bottom: 125%;
+            //   left: 15%;
+            // }
+
+             /* Tooltip Styling */
+            .chatbot-tooltip {
+              position: relative;
+              overflow:hidden;
+              background: ${widgetStyle.tooltip_bg};
+              color: ${widgetStyle.tooltip_color} !important;
+              border-radius: ${widgetStyle.tooltip_radius}px;
+              padding: ${widgetStyle.tooltip_border_width || 1}px !important;
+              font-size: 12px;
+              white-space: nowrap;
+              opacity: 0;
+              transition: opacity 0.5s ease, transform 0.5s ease;
+              pointer-events: none;
+            }
+
+            /* Tooltip Animation */
+            .chatbot-tooltip::before {
+              content: "";
+              // position: absolute;
+              inset: -1000%;
+              background: conic-gradient(from 90deg at 50% 50%, ${
+                widgetStyle.tooltip_primary_color
+              } 50%, ${widgetStyle.tooltip_secondary_color} 100%);
+              z-index: 0;
+              animation: spin 2s linear infinite;
+            }
+
+            .chatbot-tooltip-content {
+              // display: inline-flex;
+              height: 100%;
+              width: 100%;
+              font-size: 14px;
+              padding: 10px 20px;
+              backdrop-filter: blur(12px);
+              gap: 8px;
+              position: relative;
+              z-index: 1; /* Ensures content stays above the animated border */
+              background: ${widgetStyle.tooltip_bg};
+              color: ${widgetStyle.tooltip_color} !important;
+              border-radius: ${widgetStyle.tooltip_radius}px;
+            }
+            .chatbot-tooltip-content p {
+             margin : 0;
+            }
+      
+           `;
+
+        let existingStyleTag = document.getElementById("f20a24@widget_border");
+        if (existingStyleTag) {
+          existingStyleTag.remove();
+        }
+        const styleTag = document.createElement("style");
+        styleTag.id = "f20a24@widget_border";
+        styleTag.innerHTML = dynamicCSS;
+
+        // Append the style inside #f20a24-meera-console
+        document.head.appendChild(styleTag);
+
+        function isTooltipTextEmpty(html) {
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = html || "";
+          return tempDiv.textContent.trim() === "";
+        }
+
+        let tooltipHTML = "";
+
+        if (
+          widgetStyle?.tooltip &&
+          widgetStyle.tooltip_text &&
+          !isTooltipTextEmpty(widgetStyle.tooltip_text)
+        ) {
+          const styledTooltipText = widgetStyle.tooltip_text.replace(
+            /<p(.*?)>/g,
+            `<p$1 style="color: ${widgetStyle.tooltip_color};">`,
+          );
+
+          tooltipHTML = `
+            <div class="tooltip-main">
+              <div class="chatbot-tooltip" id="chatbot-tooltip">
+                <div class="chatbot-tooltip-content">
+                  ${styledTooltipText}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        var openButtonHTML = "";
+
+        if (widgetType === "widget_1") {
+          openButtonHTML = `<div id="f20a24-meera-console" style="
+                              ${positionCSS}
+                              ${tooltipPositionCSS}
+                              z-index: ${widgetStyleConfig?.z_index || 99999};
+                            ">
+                              <!-- Tooltip Popup -->
+                              ${tooltipHTML}
+                              <button class="f20a24-button" style="border-radius: ${
+                                widgetStyle.border_radius
+                              }px">
+                                  <span class="f20a24-button-content" style="${btncss}; display: flex; align-items: center; justify-content: center; min-width: 140px; position: relative;">
+                                    
+                                    <!-- Button Content (Text + Icon) -->
+                                    <div class="button-content" style="display: flex; align-items: center; gap: 8px;">
+                                      ${
+                                        widgetStyle.icon
+                                          ? `<img
+                                            width="22"
+                                            height="22"
+                                            src="${widgetStyle.icon}"
+                                            alt="Chatbot Icon"
+                                            class="chatbot-icon"
+                                            style="object-fit:contain;"
+                                          />`
+                                          : ""
+                                      }
+                                      <span class="button-text" style="color: ${
+                                        widgetStyle.textColor
+                                      } !important;">${buttonText}</span>
+                                    </div>
+                                    <!-- Loader -->
+                                    <div class="loader-dots" style="position: absolute; left: 50%; transform: translateX(-50%); visibility: hidden; opacity: 0;">
+                                    <div class="btn-loader"></div> 
+                                    </div>
+                                  </span>
+                                </button>
+                            </div>
+                          `;
+        } else if (widgetType === "widget_2") {
+          let productImage = null;
+          let productName = null;
+          const isMultiple = this.options?.layout === "multiple";
+          if (isMultiple) {
+            // MULTIPLE → typewriter text
+            texts =
+              widgetStyle?.button_texts?.length > 0
+                ? widgetStyle.button_texts
+                : [widgetStyle?.buttonText || "Search using AI"];
+          } else {
+            // NOT MULTIPLE → Call API to get product details
+            const productId = this.options.product_id;
+
+            if (productId) {
+              fetch(
+                `${config.apiUrl}/product?website_id=${this.siteId}&id=${productId}`,
+                {
+                  headers: {
+                    Accept: "application/json",
+                  },
+                },
+              )
+                .then((r) => r.json())
+                .then((res) => {
+                  if (res) {
+                    productName = res?.name;
+                    productImage = res?.main_image;
+
+                    const el = document.querySelector(
+                      "#f20a24-meera-console .typewriter-text",
+                    );
+
+                    if (el)
+                      el.textContent = `Ask about this product "${productName}"`;
+
+                    const imgEl = document.querySelector(
+                      "#f20a24-meera-console .button-product-img",
+                    );
+                    if (imgEl && productImage) imgEl.src = productImage;
+                  }
+                })
+                .catch((err) => console.error("PRODUCT API ERROR:", err));
+            }
+          }
+
+          // Text container
+          const buttonTextHTML = `
+      <div class="typewriter-text" 
+          style="height:20px; line-height:20px; overflow:hidden; white-space:nowrap;text-overflow: ellipsis;"></div>
+    `;
+
+          // MAIN HTML
+          openButtonHTML = `
+    <div id="f20a24-meera-console" style="
+      z-index: ${widgetStyleConfig?.z_index || 99999};
+      bottom: ${widgetStyleConfig.position_bottom || 40}px;
+      max-width: 95%;
+      width: ${
+        deviceType === "mobile"
+          ? "95%"
+          : `${Math.min(widgetStyle.width || 500, window.innerWidth * 0.95)}px`
+      };
+      left: 50%;
+      right: 50%;
+      transform: translate(-50%, -5%);
+    ">
+      <span style="
+        width: 100%;
+        display: flex;
+        cursor: pointer;
+        padding: 8px 16px;
+        align-items: center;
+        font-size: 14px;
+        font-weight: ${widgetStyle.fontWeight || "500"};
+        font-style: ${widgetStyle.fontStyle || "normal"};
+        border: ${widgetStyle?.border_width || 1}px solid ${
+          widgetStyle.border_color || "#ccc"
+        };
+        background-color: ${widgetStyle.buttonColor || "#fff"};
+        color: ${widgetStyle.textColor || "#000"} !important;
+        border-radius: ${widgetStyle.border_radius || "9999"}px;
+        gap: 8px;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        position: relative;
+      ">
+        <div class="button-content" style="display:flex; align-items:center; gap:8px; width:100%;">
+          ${
+            isMultiple
+              ? widgetStyle.icon
+                ? `<img src="${widgetStyle.icon}" alt="Button Icon" width="22" height="22" style="width:22px;height:22px;object-fit:contain;"/>`
+                : ""
+              : `<img class="button-product-img" 
+                      src="" 
+                      style="width:22px;height:22px;object-fit:contain;border-radius:4px;" />`
+          }
+
+          <div class="scrolling-text-wrapper" 
+              style="overflow:hidden; height:20px; position:relative; flex:1;">
+            ${buttonTextHTML}
+          </div>
+
+          <div style="margin-left:auto;display:flex;align-items:center;">
+             <svg fill="currentColor" width="32" height="32" viewBox="0 0 56.00 56.00" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M27.9999 51.9063C41.0546 51.9063 51.9063 41.0781 51.9063 28C51.9063 14.9453 41.0312 4.0937 27.9765 4.0937C14.8983 4.0937 4.0937 14.9453 4.0937 28C4.0937 41.0781 14.9218 51.9063 27.9999 51.9063ZM27.9999 14.8516C28.5624 14.8516 29.0077 15.0859 29.5234 15.5781L38.1483 24.2266C38.453 24.5547 38.6874 25 38.6874 25.539C38.6874 26.5937 37.8671 27.4141 36.8124 27.4141C36.2499 27.4141 35.7812 27.2031 35.453 26.8516L32.3124 23.6641L29.7109 20.5703L29.9218 25.9844L29.9218 39.2734C29.9218 40.3984 29.1249 41.1719 27.9999 41.1719C26.8749 41.1719 26.078 40.3984 26.078 39.2734L26.078 25.9844L26.2655 20.5937L23.7109 23.6641L20.5468 26.8516C20.2187 27.1797 19.7265 27.4141 19.1874 27.4141C18.1093 27.4141 17.3358 26.5937 17.3358 25.539C17.3358 25 17.5234 24.5547 17.8514 24.2266L26.4999 15.5781C27.0155 15.0625 27.4374 14.8516 27.9999 14.8516Z"></path>
+                    </svg>
+          </div>
+
+          <span class="selected_count"></span>
+        </div>
+
+        <div class="loader-dots" style="position:absolute; left:50%; transform:translateX(-50%); visibility:hidden; opacity:0;">
+          <div class="btn-loader"></div>
+        </div>                        
+      </span>
+    </div>
+  `;
+
+          // TYPEWRITER LOGIC (only if multiple)
+          setTimeout(() => {
+            const textEl = document.querySelector(
+              "#f20a24-meera-console .typewriter-text",
+            );
+            if (!textEl) return;
+
+            if (!isMultiple) {
+              // STATIC text only
+              textEl.textContent = texts[0];
+              return;
+            }
+
+            // TYPEWRITER for MULTIPLE
+            let index = 0;
+            let charIndex = 0;
+            let deleting = false;
+
+            const type = () => {
+              const currentText = texts[index];
+
+              if (!deleting) {
+                textEl.textContent = currentText.slice(0, charIndex + 1);
+                charIndex++;
+                if (charIndex === currentText.length) {
+                  deleting = true;
+                  setTimeout(type, 1200);
+                  return;
+                }
+              } else {
+                textEl.textContent = currentText.slice(0, charIndex - 1);
+                charIndex--;
+                if (charIndex === 0) {
+                  deleting = false;
+                  index = (index + 1) % texts.length;
+                }
+              }
+              setTimeout(type, deleting ? 5 : 100);
+            };
+
+            type();
+          }, 300);
+        } else
+          openButtonHTML = `
+            <div id="f20a24-meera-console" style="
+                              ${positionCSS}
+                              ${tooltipPositionCSS}; min-width: fit-content;
+                              z-index: ${widgetStyleConfig?.z_index || 99999};
+                            ">
+              <!-- Tooltip Popup -->
+              ${tooltipHTML}
+                ${
+                  widgetStyle.icon
+                    ? `<img
+                        width="auto"
+                        height="${widgetStyle?.img_height || 22}"
+                        src="${widgetStyle.icon}"
+                        alt="Chatbot Icon"
+                        class="chatbot-icon"
+                        style="object-fit: contain; width: auto ; height: ${
+                          widgetStyle?.img_height || 22
+                        }px; border-radius: ${
+                          widgetStyle.border_radius
+                        }px; border:  ${widgetStyle.border_width}px solid ${
+                          widgetStyle.border_color || "#fff"
+                        };  "
+                      />`
+                    : ""
+                }
+            </div>
+          `;
+        shortcode.innerHTML = openButtonHTML;
+
+        // Ensure tooltip is available before modifying styles
+        setTimeout(() => {
+          const tooltip = document.getElementById("chatbot-tooltip");
+          if (tooltip) {
+            tooltip.style.display = "block";
+            tooltip.style.opacity = "1";
+            tooltip.style.transform = "translateY(0)";
+          } else {
+            console.error("Tooltip not found in DOM!");
+          }
+        }, 500); // Show after 0.5 seconds
+
+        setTimeout(() => {
+          const tooltip = document.getElementById("chatbot-tooltip");
+          if (tooltip) {
+            tooltip.style.display = "none";
+            tooltip.style.opacity = "0";
+            tooltip.style.transform = "translateY(10px)";
+          }
+        }, 5000); // Hide after 4 seconds
+
+        // Jumping effect after 10 seconds
+        if (widgetType !== "widget_2") {
+          setTimeout(() => {
+            const chatbotButton = document.getElementById(
+              "f20a24-meera-console",
+            );
+            if (chatbotButton) {
+              chatbotButton.classList.add("jump-animation");
+            }
+          }, 5000); // Jump effect starts after 10 seconds
+        }
+      }
+      const console_time = Number(widgetStyleConfig?.console_time);
+
+      if (!isNaN(console_time) && console_time > 0) {
+        const delay = console_time * 1000; // convert to milliseconds
+
+        setTimeout(() => {
+          // ✅ Only run if the pathname is root "/"
+          if (window.location.pathname === "/") {
+            const openButton = document.getElementById("f20a24-meera-console");
+            if (openButton) {
+              openButton.click(); // Trigger chatbot open
+            }
+          }
+        }, delay);
+      }
+
+      this.intializeMeeraConsole(); // Attach event listener
+      this.attachSearchButtonListener();
+    } catch (error) {
+      console.error("Error fetching chatbot data:", error);
+    }
+  };
+
+  ChatbotSDK.prototype.updateButtonText = function () {
+    var productCount = this.options.selectedProducts?.length || 0;
+    if (this.widget_type === "widget_1") {
+      var newButtonText =
+        this.options.layout === "multiple" && productCount > 0
+          ? `${this.btnText} (${productCount})`
+          : this.btnText;
+
+      var buttonTextSpan = document.querySelector(
+        "#f20a24-meera-console .button-text",
+      );
+      if (buttonTextSpan) {
+        buttonTextSpan.textContent = newButtonText;
+      }
+    } else if (this.widget_type === "widget_2") {
+      var newButtonCount =
+        this.options.layout === "multiple" && productCount > 0
+          ? `(${productCount})`
+          : null;
+
+      var buttonTextSpan = document.querySelector(
+        "#f20a24-meera-console .selected_count",
+      );
+      if (buttonTextSpan) {
+        buttonTextSpan.textContent = newButtonCount;
+      }
+    }
+  };
+
+  // Create the chatbot widget container (overlay + widget)
+  ChatbotSDK.prototype.createChatbotWidget = function () {
+    var overlayElement = document.createElement("div");
+    overlayElement.id = "chatbot-overlay";
+    overlayElement.classList.add("chatbot-overlay");
+
+    var widgetElement = document.createElement("div");
+    widgetElement.id = "chatbot-widget";
+    widgetElement.classList.add("chatbot-widget");
+
+    // Store references (iframe will be created on click)
+    this.widgetElement = widgetElement;
+    this.overlayElement = overlayElement;
+
+    widgetElement.appendChild(document.createElement("div")); // placeholder
+    overlayElement.appendChild(widgetElement);
+    document.body.appendChild(overlayElement);
+
+    const setIframeHeight = () => {
+      const isMobile = window.innerWidth <= 640;
+
+      const viewportHeight =
+        window.visualViewport?.height || window.innerHeight;
+
+      const safeBottom = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "env(safe-area-inset-bottom)",
+        ) || 0,
+      );
+
+      widgetElement.style.height = isMobile
+        ? `${viewportHeight * 0.97}px`
+        : `${viewportHeight * 0.95}px`;
+      widgetElement.style.width = isMobile ? "95%" : "100%";
+      widgetElement.style.borderRadius = isMobile ? "10px" : "10px 10px 0 0";
+      widgetElement.style.position = "fixed";
+      widgetElement.style.bottom = isMobile ? "auto" : "0";
+      widgetElement.style.top = "auto";
+      widgetElement.style.left = isMobile ? "50%" : "0";
+      widgetElement.style.transform = isMobile ? "translateX(-50%)" : "none";
+
+      if (this.iframe) {
+        this.iframe.style.height = "100%";
+      }
+    };
+
+    // Initial height
+    setIframeHeight();
+
+    // Listeners
+    window.addEventListener("resize", () => {
+      setTimeout(setIframeHeight, 50);
+    });
+  };
+
+  ChatbotSDK.prototype.intializeMeeraConsole = function () {
+    this.createChatbotWidget();
+    var openButton = document.getElementById("f20a24-meera-console");
+    if (openButton) {
+      this.widgetElement.style.background = "#E5E7EB";
+      this.attachOpenButtonListener();
+    }
+  };
+
+  ChatbotSDK.prototype.buildIframeSrc = function () {
+    const buildVersion = new Date().getTime();
+    const siteId = this.siteId;
+    const token = localStorage.getItem("secure_token");
+    const website = window.location.origin;
+    const query = this?.search_query || "";
+    const color = this.storeColor;
+    const name = this.storeName;
+    const selected = this.options?.selectedProducts || [];
+
+    let src = "";
+
+    const isMobile = window.innerWidth <= 640;
+
+    if (isMobile) {
+      src = token
+        ? `${
+            config.sdkUrl
+          }/ai-search/?_s=${siteId}&access_token=${token}&v=${buildVersion}${
+            selected.length > 0 ? `&sp=${selected.join(",")}` : ""
+          }&website=${website}&pc=${color}&s_name=${name}`
+        : `${config.sdkUrl}/ai-search/?_s=${siteId}${
+            selected.length > 0 ? `&sp=${selected.join(",")}` : ""
+          }&v=${buildVersion}&website=${website}&system=true&pc=${color}&s_name=${name}`;
+    } else {
+      if (this.console === "search") {
+        if (this.trigger_place === "ai_search") {
+          src = token
+            ? `${config.sdkUrl}/ai-search/?_s=${siteId}&access_token=${token}&website=${website}&v=${buildVersion}&query=${query}&pc=${color}&s_name=${name}`
+            : `${config.sdkUrl}/ai-search/?_s=${siteId}&v=${buildVersion}&website=${website}&query=${query}&system=true&pc=${color}&s_name=${name}`;
+        }
+
+        if (this.trigger_place === "dc") {
+          if (this.dcLayout === "multiple") {
+            src = token
+              ? `${
+                  config.sdkUrl
+                }/?_s=${siteId}&access_token=${token}&website=${website}&sp=${selected.join(
+                  ",",
+                )}&v=${buildVersion}&pc=${color}&s_name=${name}`
+              : `${
+                  config.sdkUrl
+                }/?_s=${siteId}&v=${buildVersion}&website=${website}&query=${query}&sp=${selected.join(
+                  ",",
+                )}&system=true&pc=${color}&s_name=${name}`;
+          } else {
+            const pid = this.dcProduct || selected[0];
+            src = token
+              ? `${config.sdkUrl}/?_s=${siteId}&p_id=${pid}&access_token=${token}&v=${buildVersion}&website=${website}&pc=${color}&s_name=${name}`
+              : `${config.sdkUrl}?_s=${siteId}&p_id=${pid}&v=${buildVersion}&website=${website}&system=true&pc=${color}&s_name=${name}`;
+          }
+        }
+
+        if (this.trigger_place === "store") {
+          src = token
+            ? `${config.sdkUrl}/store${this.storeCategory ? `/${this.storeCategory}` : ""}/?_s=${siteId}&access_token=${token}&website=${website}&v=${buildVersion}&pc=${color}&s_name=${name}`
+            : `${config.sdkUrl}/store${this.storeCategory ? `/${this.storeCategory}` : ""}/?_s=${siteId}&v=${buildVersion}&website=${website}&query=${query}&system=true&pc=${color}&s_name=${name}`;
+        }
+      } else if (this.options?.layout === "multiple") {
+        src = token
+          ? `${config.sdkUrl}/${
+              selected.length === 0 ? "ai-search/" : ""
+            }?_s=${siteId}&access_token=${token}&v=${buildVersion}${
+              selected.length > 0 ? `&sp=${selected.join(",")}` : ""
+            }&website=${website}&pc=${color}&s_name=${name}`
+          : `${config.sdkUrl}/${
+              selected.length === 0 ? "ai-search/" : ""
+            }?_s=${siteId}${
+              selected.length > 0 ? `&sp=${selected.join(",")}` : ""
+            }&v=${buildVersion}&website=${website}&system=true&pc=${color}&s_name=${name}`;
+      } else {
+        src = token
+          ? `${config.sdkUrl}/?_s=${siteId}&p_id=${this.options.product_id}&access_token=${token}&v=${buildVersion}&website=${website}&pc=${color}&s_name=${name}`
+          : `${config.sdkUrl}?_s=${siteId}&p_id=${this.options.product_id}&v=${buildVersion}&website=${website}&system=true&pc=${color}&s_name=${name}`;
+      }
+    }
+
+    return src;
+  };
+
+  // Store handler globally so removeEventListener works correctly
+  const preventDefaultHandler = (e) => {
+    // Prevent iOS pull-to-refresh and scrolling
+    if (e.cancelable) e.preventDefault();
+  };
+  const lockScroll = () => {
+    const scrollY = window.scrollY;
+
+    // 🧊 Lock body scroll position
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+    document.body.dataset.scrollY = scrollY;
+
+    // 🚫 Prevent pull-to-refresh and overscroll
+    document.documentElement.style.overscrollBehavior = "none";
+    document.body.style.overscrollBehavior = "none";
+
+    // ✅ iOS fix: register listener early with passive: false
+    window.addEventListener("touchmove", preventDefaultHandler, {
+      passive: false,
+    });
+    document.addEventListener("touchmove", preventDefaultHandler, {
+      passive: false,
+    });
+  };
+
+  const unlockScroll = () => {
+    const scrollY = parseInt(document.body.dataset.scrollY || "0", 10);
+
+    // ♻️ Restore scroll and body styles
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    document.body.style.overflow = "";
+    document.documentElement.style.overscrollBehavior = "";
+    document.body.style.overscrollBehavior = "";
+
+    // 🧭 Restore original scroll position
+    window.scrollTo(0, scrollY);
+
+    // ✅ Remove event listeners
+    window.removeEventListener("touchmove", preventDefaultHandler, {
+      passive: false,
+    });
+    document.removeEventListener("touchmove", preventDefaultHandler, {
+      passive: false,
+    });
+  };
+
+  function customerTrackingEvent(event) {
+    // Send event to backend
+    this.token && event &&
+    fetch(
+      `${config.apiUrl}/user/website/customer/track?event=${event}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.token}`,
+        },
+      },
+    ).catch((err) => {
+      console.error("❌ Error logging visitor console:", err);
+    });
+
+    // Send event to Google Analytics
+    if (event && window.gtag) {
+      window.gtag('event', event);
+    }
+  }
+
+  // Helper function to send GA events from iframes
+  ChatbotSDK.prototype.sendGAEvent = function (eventName, eventData = {}) {
+    if (!window.gtag) {
+      console.warn("Google Analytics not initialized");
+      return;
+    }
+    window.gtag('event', eventName, eventData);
+  };
+
+  // Attach click listener
+
+  ChatbotSDK.prototype.attachOpenButtonListener = function () {
+    var openButton = document.getElementById("f20a24-meera-console");
+    openButton.addEventListener(
+      "click",
+      async function () {
+        if (!this.siteId) {
+          console.error("site not found");
+          return null;
+        }
+
+        const loader = openButton?.querySelector(".loader-dots");
+        const content = openButton?.querySelector(".button-content");
+        const loaderDot = document.querySelector(".btn-loader");
+        loaderDot?.style?.setProperty("--loader-color", this.btnTextColor);
+        // When loading starts
+        if (loader && content) {
+          content.style.visibility = "hidden";
+          content.style.opacity = "0";
+          loader.style.visibility = "visible";
+          loader.style.opacity = "1";
+        }
+
+        const drawer = document.getElementById("custom-drawer");
+        if (drawer) {
+          drawer.classList.remove("show", "show-half");
+        }
+
+        lockScroll();
+
+        // Create iframe on first click
+        if (!this.iframe) {
+          this.iframe = document.createElement("iframe");
+          this.iframe.style.width = "100%";
+          this.iframe.style.height = "100%";
+          this.iframe.style.border = "none";
+          this.iframe.style.display = "none";
+          this.iframe.allow = "microphone";
+          this.iframe.allow = "geolocation";
+          this.iframe.sandbox =
+            "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation";
+          this.widgetElement.appendChild(this.iframe);
+        }
+
+        const newSrc = this.buildIframeSrc();
+        const iframe = this.iframe;
+
+        iframe.style.display = "none"; // hide during load
+
+        if (iframe.src !== newSrc) {
+          iframe.src = newSrc;
+        }
+        iframe.onload = () => {
+          // Restore button content
+          if (loader && content) {
+            loader.style.visibility = "hidden";
+            loader.style.opacity = "0";
+            content.style.visibility = "visible";
+            content.style.opacity = "1";
+          }
+          this.overlayElement.classList.add("show_widget");
+          iframe.style.display = "block";
+        };
+
+        setInterval(() => {
+          iframe.contentWindow.postMessage(
+            { type: "KEEP_ALIVE", from: "parent" },
+            config.sdkUrl,
+          );
+        }, 15000);
+
+        const fpPromise = import("https://openfpcdn.io/fingerprintjs/v5").then(
+          (FingerprintJS) => FingerprintJS.load(),
+        );
+
+        let visitorId = null;
+        try {
+          const fp = await fpPromise;
+          const result = await fp.get();
+          visitorId = result.visitorId;
+        } catch (err) {
+          console.warn("⚠️ Failed to get fingerprint:", err);
+        }
+
+        fetch(`${config.apiUrl}/user/website/visitor/console`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            website_id: this.siteId,
+            visitor_id: visitorId,
+          }),
+        }).catch((err) => {
+          console.error("❌ Error logging visitor console:", err);
+        });
+
+        customerTrackingEvent.call(this, "search_modal_open");
+
+        iframe.onerror = () => {
+          this.widgetElement.innerHTML = "";
+          const reloadButton = document.createElement("button");
+          reloadButton.textContent = "Reload Chatbot";
+          reloadButton.style.padding = "10px 20px";
+          reloadButton.style.fontSize = "16px";
+          reloadButton.style.border = "none";
+          reloadButton.style.background = "#f6bd85";
+          reloadButton.style.color = "#fff";
+          reloadButton.style.cursor = "pointer";
+          reloadButton.style.borderRadius = "5px";
+          reloadButton.addEventListener("click", function () {
+            location.reload();
+          });
+
+          this.widgetElement.appendChild(reloadButton);
+        };
+      }.bind(this),
+    );
+  };
+
+  // Attach click listener
+  ChatbotSDK.prototype.attachSearchButtonListener = function () {
+    const openButton = document.getElementById("f20a24_quick_sense");
+    if (!openButton) return;
+
+    const consoleElement = document.getElementById("f20a24-meera-console");
+
+    // Prepare drawer if not created
+    let drawer = document.getElementById("custom-drawer");
+    if (!drawer) {
+      const isMobile = window.innerWidth <= 640;
+      const isHalf = !isMobile && this.nlsWidth === "half";
+      const drawerHTML = `
+              <div id="custom-drawer" class="custom-drawer ${isHalf ? "custom-drawer-half" : ""}">
+                  <div class="custom-drawer-content" style="position: relative;">
+                  </div>
+                </div>
+    `;
+      document.body.insertAdjacentHTML("beforeend", drawerHTML);
+      drawer = document.getElementById("custom-drawer");
+    }
+
+    const drawerContent = drawer.querySelector(".custom-drawer-content");
+    const vh = window.innerHeight * 0.01;
+    // detect mobile
+    const isMobile = window.innerWidth <= 640;
+    const isHalf = !isMobile && this.nlsWidth === "half";
+
+    if (isMobile) {
+      const height = vh * 20;
+      drawerContent.style.height = `${height}px`;
+      drawerContent.style.width = "95%";
+      drawerContent.style.margin = "10px";
+      drawerContent.style.borderRadius = "10px";
+    } else {
+      // Desktop view
+      if (isHalf) {
+        // Half width: full height, 60% width, positioned from right to left
+        drawerContent.style.height = `${vh * 100}px`;
+        drawerContent.style.width = "60%";
+        drawerContent.style.margin = "0";
+        drawerContent.style.borderRadius = "10px 0 0 10px";
+      } else {
+        // Full width: default behavior
+        const height = vh * 95;
+        drawerContent.style.height = `${height}px`;
+        drawerContent.style.width = "100%";
+        drawerContent.style.margin = "0";
+        drawerContent.style.borderRadius = "10px 10px 0 0";
+      }
+    }
+
+    // If iframe not already present, create it (preload)
+    let iframe = drawerContent.querySelector("iframe");
+    if (!iframe) {
+      const token = localStorage.getItem("secure_token");
+      const searchUrl = `${config?.QuickSearchUrl}/?_s=${this.siteId}&${
+        token ? `access_token=${token}` : "system=true"
+      }`;
+
+      iframe = document.createElement("iframe");
+      iframe.id = "drawer-iframe";
+      iframe.src = searchUrl;
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.allow = "geolocation";
+
+      // Loader
+      const loaderContainer = document.createElement("div");
+      loaderContainer.id = "search-loader";
+      loaderContainer.style.position = "absolute";
+      loaderContainer.style.top = "50%";
+      loaderContainer.style.left = "50%";
+      loaderContainer.style.transform = "translate(-50%, -50%)";
+      loaderContainer.style.display = "flex";
+      loaderContainer.style.flexDirection = "column";
+      loaderContainer.style.alignItems = "center";
+      loaderContainer.style.justifyContent = "center";
+      loaderContainer.style.zIndex = "999";
+
+      const loaderBox = document.createElement("div");
+      loaderBox.classList.add("loader");
+
+      [1, 2, 3, 4, 5].forEach(() => {
+        const circle = document.createElement("div");
+        circle.classList.add("circle");
+        circle.style.backgroundColor = this.storeColor || "#2d6bc6";
+        circle.style.width = isMobile ? "12px" : "20px";
+        circle.style.height = isMobile ? "12px" : "20px";
+        loaderBox.appendChild(circle);
+      });
+
+      const text = document.createElement("span");
+      text.innerText = "By Flow Automate Solutions LLP";
+      text.style.position = "absolute";
+      text.style.bottom = "20px";
+      text.style.left = "50%";
+      text.style.transform = "translateX(-50%)";
+      text.style.fontFamily = "Montserrat, sans-serif";
+
+      loaderContainer.appendChild(loaderBox);
+
+      // Append elements to drawer
+      drawerContent.appendChild(loaderContainer);
+      drawerContent.appendChild(text);
+      drawerContent.appendChild(iframe);
+
+      iframe.onload = () => {
+        const loader = document.getElementById("search-loader");
+        if (loader) loader.remove();
+        text.style.display = "none";
+      };
+    }
+
+    // Button click logic
+    openButton.addEventListener(
+      "click",
+      async function () {
+        if (!this.siteId) {
+          console.error("site not found");
+          return;
+        }
+
+        if (typeof this.options?.updateSelectedProducts === "function") {
+          this.options.updateSelectedProducts([]);
+        }
+        lockScroll();
+
+        const drawer = document.getElementById("custom-drawer");
+        const drawerContent = drawer.querySelector(".custom-drawer-content");
+
+        // drawer.style.display = "block";
+
+        // Hide console element when quick sense drawer opens
+        if (consoleElement) consoleElement.style.display = "none";
+
+        const isHalf = !!drawer.classList.contains("custom-drawer-half");
+        drawer.classList.add(isHalf ? "show-half" : "show");
+
+        const fpPromise = import("https://openfpcdn.io/fingerprintjs/v5").then(
+          (FingerprintJS) => FingerprintJS.load(),
+        );
+
+        let visitorId = null;
+        try {
+          const fp = await fpPromise;
+          const result = await fp.get();
+          visitorId = result.visitorId;
+        } catch (err) {
+          console.warn("⚠️ Failed to get fingerprint:", err);
+        }
+
+        fetch(`${config.apiUrl}/user/website/visitor/console`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            website_id: this.siteId,
+            visitor_id: visitorId,
+          }),
+        }).catch((err) => {
+          console.error("❌ Error logging visitor console:", err);
+        });
+
+        customerTrackingEvent.call(this, "serch_modal_open");
+        // Click outside to close
+        drawer.addEventListener("click", (e) => {
+          if (!drawerContent.contains(e.target)) {
+            if (typeof this.options?.updateSelectedProducts === "function") {
+              this.options.updateSelectedProducts([]);
+            }
+            const isHalf = !!drawer.classList.contains("custom-drawer-half");
+            drawer.classList.remove(isHalf ? "show-half" : "show");
+            unlockScroll();
+            if (consoleElement) consoleElement.style.display = "block";
+          }
+        });
+      }.bind(this),
+    );
+  };
+
+  // Attach event listener to listen for messages from the iframe
+  ChatbotSDK.prototype.attachMessageListener = function () {
+    window.addEventListener(
+      "message",
+      function (event) {
+        if (event.origin === config?.QuickSearchUrl) {
+          const drawer = document.getElementById("custom-drawer");
+          const drawerContent = drawer.querySelector(".custom-drawer-content");
+          const adjustHeight = (reduceBy = 0) => {
+            const vh = window.visualViewport?.height || window.innerHeight;
+            drawerContent.style.height = `${vh - reduceBy}px`;
+          };
+
+          // ✅ Keep current offset value in a variable
+          let currentOffset = 0;
+
+          // 🔄 Update height on keyboard or viewport resize
+          window.visualViewport?.addEventListener("resize", () => {
+            adjustHeight(currentOffset);
+          });
+
+          if (event.data.type === "selectedProducts") {
+            this.options.updateSelectedProducts(event.data.payload);
+          }
+          if (event.data.type === "HIDE_CLOSE") {
+            // const closeBtn = document.getElementById("drawer-close");
+            // closeBtn.style.display = event.data.style;
+          }
+          if (event.data.type === "CLOSE") {
+            const isHalf = !!drawer.classList.contains("custom-drawer-half");
+            drawer.classList.remove(isHalf ? "show-half" : "show");
+            unlockScroll();
+            const consoleElement = document.getElementById(
+              "f20a24-meera-console",
+            );
+            if (consoleElement) consoleElement.style.display = "block";
+          }
+
+          if (event.data.type === "SEARCH_INPUT_FOCUS") {
+            currentOffset = 0; // reduce 50px
+            adjustHeight(currentOffset);
+          }
+
+          if (event.data.type === "SEARCH_INPUT_BLUR") {
+            currentOffset = 0; // reset
+            adjustHeight(currentOffset);
+          }
+          if (event.data?.type === "TRIGGER_MEERA_CONSOLE") {
+            this.console = "search";
+            if (event.data?.trigger_place === "ai_search") {
+              this.trigger_place = "ai_search";
+              this.search_query = event.data?.query || "";
+            }
+            if (event.data?.trigger_place === "dc") {
+              this.trigger_place = "dc";
+              this.dcLayout = event.data?.layout;
+              this.dcProduct = event.data?.product_id;
+              if (event.data?.selectedPins) {
+                this.options.updateSelectedProducts(event.data?.selectedPins);
+              }
+            }
+            if (event.data?.trigger_place === "store") {
+              this.trigger_place = "store";
+              this.storeCategory = event.data?.category || null;
+            }
+            const consoleBtn = document.getElementById("f20a24-meera-console");
+            if (consoleBtn) consoleBtn.click();
+          }
+          if (event.data.type === "login") {
+            localStorage.setItem("secure_token", event.data.payload);
+            this.token = event.data.payload;
+            this.options.updatePinnedUI();
+          }
+        }
+        if (event.origin === config.sdkUrl) {
+          if (event.data?.type === "keepAlive") {
+            // do nothing, just prevents background freeze
+          }
+          if (event.data.type === "restore-parent") {
+            // Respond back with parent URL
+            window.location.reload();
+          }
+          if (event.data.type === "trackEvent") { 
+            this.token = event.data.token;
+            setTimeout(() => {
+              customerTrackingEvent.call(this, event.data.event);
+            }, 2000);
+           }
+          if (event.data.type === "gaEvent") {
+            this.sendGAEvent(event.data.eventName, event.data.eventData);
+           }
+
+          if (event.data === "closeChat") {
+            this.console = "direct";
+            this.search_query = "";
+            this.closeChatSdk();
+          }
+          if (event.data.type === "login") {
+            localStorage.setItem("secure_token", event.data.payload);
+            this.token = event.data.payload;
+            this.options.updatePinnedUI();
+          }
+          if (event.data === "logout") {
+            this.token = null;
+            this.options.logout();
+          }
+          if (event.data.type === "selectedProducts") {
+            this.options.updateSelectedProducts(event.data.payload);
+          }
+        }
+      }.bind(this),
+    );
+  };
+
+  // Close the chatbot SDK
+  ChatbotSDK.prototype.closeChatSdk = function () {
+    unlockScroll();
+    if (this.options.layout === "multiple") {
+      this.options.updatePinnedUI();
+    }
+    customerTrackingEvent.call(this, "search_modal_close");
+    document.getElementById("chatbot-overlay").classList.remove("show_widget");
+    // Optionally, show the open button again
+    document.getElementById("f20a24-meera-console").style.display = "block";
+  };
+
+  window.ChatbotSDK = ChatbotSDK;
+})(window, document);

@@ -1,0 +1,276 @@
+/* styles.css */
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"); */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+#chatbot-widget {
+  font-family: "Inter", "san-serif" !important;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  overflow: hidden;
+}
+
+/* Scrollbar Styles */
+#chatbot-widget ::-webkit-scrollbar {
+  width: 5px; /* Adjust width of the scrollbar */
+}
+
+#chatbot-widget ::-webkit-scrollbar-thumb {
+  background-color: #cbcbcb; /* Thumb color */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+#chatbot-widget ::-webkit-scrollbar-thumb:hover {
+  background-color: #d8d8d8; /* Darker color on hover */
+}
+
+#chatbot-widget ::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Track color */
+  border-radius: 10px;
+  margin: 5px 0; /* Spacing at the top and bottom of the track */
+}
+
+/* If you have another container #chatbot-shortcode, you can apply its specific styles similarly */
+#chatbot-shortcode {
+  font-family: "Montserrat", sans-serif !important;
+}
+/* overlay */
+#chatbot-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  transform: translateY(100%);
+  overflow: hidden;
+}
+
+/* widget */
+#chatbot-widget {
+  top: 0;
+  left: 0;
+  /* max-width: 1536px; */
+  height: 100%; /* JS will override dynamically for mobile */
+  background: #fff;
+  /* border-radius: 10px 10px 0 0; */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  z-index: 999999;
+}
+
+/* iframe inside widget */
+#chatbot-widget iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#chatbot-overlay.show_widget {
+  /* display: flex; */
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#f20a24-meera-console {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 14px;
+  border: none;
+  /* border-radius: 100%; */
+  min-width: 175px;
+  /* padding: 10px 20px; */
+  cursor: pointer;
+
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+#f20a24-meera-console:hover {
+  transform: scale(1.1);
+}
+
+/* Gradient animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.jump-animation {
+  animation: jump 0.5s ease-in-out 3; /* Jumps 3 times */
+}
+
+/* sai.... */
+
+#f20a24-meera-console .hidden {
+  display: none;
+}
+.block {
+  display: block;
+}
+.user {
+  padding: 10px;
+  background-color: #f2f2f2;
+  border-radius: 10px;
+}
+
+/* loader */
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle {
+  border-radius: 50%;
+  margin: 0 10px;
+  /* background-color: #2d6bc6; */
+  animation: circle 1s ease-in-out infinite;
+}
+
+.circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.circle:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.circle:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+@keyframes circle {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.custom-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column; /* important */
+  justify-content: flex-end; /* push content to bottom */
+  background: rgba(0, 0, 0, 0.4); /* translucent black */
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 9999;
+}
+
+.custom-drawer.show {
+  transform: translateY(0);
+}
+
+.custom-drawer.show-half {
+  transform: translateX(0);
+}
+
+.custom-drawer-half {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: rgba(0, 0, 0, 0.4);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 9999;
+}
+
+.custom-drawer-half .custom-drawer-content {
+  margin-left: auto !important;
+}
+
+.custom-drawer-content {
+  /* height: 95dvh; */
+  /* width: 100%; */
+  align-items: center;
+  background: white;
+  overflow-y: auto;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.loader-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.btn-loader {
+  width: 10px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  animation: l5 1s infinite linear alternate;
+  --loader-color: #000;
+}
+@keyframes l5 {
+  0% {
+    box-shadow: 20px 0 var(--loader-color), -20px 0 #0002;
+    background: var(--loader-color);
+  }
+  33% {
+    box-shadow: 20px 0 var(--loader-color), -20px 0 #0002;
+    background: #0002;
+  }
+  66% {
+    box-shadow: 20px 0 #0002, -20px 0 var(--loader-color);
+    background: #0002;
+  }
+  100% {
+    box-shadow: 20px 0 #0002, -20px 0 var(--loader-color);
+    background: var(--loader-color);
+  }
+}
