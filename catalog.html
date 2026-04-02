@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog - Shagun Ratna</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* --- PREMIUM COLOR PALETTE & BASE --- */
+        :root {
+            --beige-60: #F9F6F0;
+            --maroon-30: #4A1C24;
+            --gold-10: #C5A059;
+            --white: #FFFFFF;
+            --black: #0A0A0A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--beige-60);
+            color: var(--maroon-30);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        h1 i,
+        h2 i,
+        .serif i {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--gold-10);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--beige-60);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-10);
+            border-radius: 3px;
+        }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-content {
+            width: 100%;
+            text-align: center;
+        }
+
+        .loader-line-wrapper {
+            width: 300px;
+            height: 1px;
+            background: rgba(244, 241, 234, 0.15);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .loader-line {
+            width: 0%;
+            height: 100%;
+            background: var(--gold-10);
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 4rem;
+            z-index: 1000;
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        nav .logo,
+        nav .nav-links a,
+        nav .nav-icons i,
+        nav .auth-links a {
+            color: var(--white);
+        }
+
+        .logo {
+            font-size: 2rem;
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--gold-10);
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 3.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: color 0.4s ease;
+        }
+
+        .nav-links a:hover,
+        nav .nav-icons i:hover,
+        .auth-links a:hover {
+            color: var(--gold-10) !important;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-icons i {
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.4s ease;
+        }
+
+        .auth-links {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+            margin-right: 1.5rem;
+        }
+
+        .auth-links a {
+            text-decoration: none;
+            transition: color 0.4s ease;
+        }
+
+        nav.nav-scrolled {
+            background: rgba(249, 246, 240, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 1.2rem 4rem;
+            border-bottom: 1px solid rgba(74, 28, 36, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        nav.nav-scrolled .logo,
+        nav.nav-scrolled .nav-links a,
+        nav.nav-scrolled .nav-icons i,
+        nav.nav-scrolled .auth-links a {
+            color: var(--maroon-30);
+        }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            text-decoration: none;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-gold {
+            background: var(--gold-10);
+            color: var(--white);
+            border: 1px solid var(--gold-10);
+        }
+
+        .btn-gold:hover {
+            background: transparent;
+            color: var(--gold-10);
+        }
+
+        .w-100 {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* --- CATALOG HERO --- */
+        .catalog-hero {
+            position: relative;
+            height: 60vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: var(--black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .catalog-hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background-image: url('https://images.unsplash.com/photo-1599643478514-4a820cbf311e?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center 30%;
+            z-index: 1;
+        }
+
+        .catalog-hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .catalog-hero-content {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+            padding-top: 5rem;
+        }
+
+        .catalog-hero-content h1 {
+            font-size: 4.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .catalog-hero-content p {
+            font-size: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--gold-10);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* --- FILTER BAR --- */
+        .filter-section {
+            background: var(--beige-60);
+            padding: 4rem 4rem 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .filter-list {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .filter-btn {
+            background: none;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--maroon-30);
+            cursor: pointer;
+            transition: color 0.3s;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold-10);
+            transition: width 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            color: var(--gold-10);
+        }
+
+        .filter-btn:hover::after,
+        .filter-btn.active::after {
+            width: 100%;
+        }
+
+        /* --- PRODUCT GRID --- */
+        .catalog-container {
+            padding: 2rem 4rem 8rem;
+            background: var(--beige-60);
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 3rem;
+        }
+
+        .product-card {
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(107, 39, 55, 0.05);
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px) !important;
+            box-shadow: 0 20px 40px rgba(107, 39, 55, 0.15);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .product-card:hover .product-img img {
+            transform: scale(1.08);
+        }
+
+        .quick-view {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--maroon-30);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            font-weight: 500;
+        }
+
+        .product-card:hover .quick-view {
+            transform: translateY(0);
+        }
+
+        .product-info {
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .product-info h3 {
+            font-size: 1.4rem;
+            color: var(--maroon-30);
+            margin-bottom: 0.8rem;
+        }
+
+        .product-info p.price {
+            color: var(--gold-10);
+            font-size: 1.1rem;
+            font-style: italic;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- FOOTER (Same as Homepage) --- */
+        footer {
+            background-color: var(--white);
+            padding: 6rem 4rem 2rem 4rem;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4rem;
+        }
+
+        .footer-logo {
+            font-size: 2.5rem;
+            color: var(--maroon-30);
+        }
+
+        .footer-logo span {
+            color: var(--gold-10);
+            font-style: italic;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 5rem;
+        }
+
+        .link-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .link-column a {
+            text-decoration: none;
+            color: var(--maroon-30);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .link-column a:hover {
+            color: var(--gold-10);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(74, 28, 36, 0.1);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--maroon-30);
+        }
+
+        /* --- MODALS (Same as Homepage) --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-box {
+            background: var(--beige-60);
+            padding: 4rem 3rem;
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            display: none;
+            border-top: 4px solid var(--gold-10);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            color: var(--maroon-30);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--gold-10);
+        }
+
+        .modal-box h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            color: var(--maroon-30);
+            margin-bottom: 2.5rem;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: transparent;
+            border: 1px solid rgba(74, 28, 36, 0.2);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: var(--maroon-30);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--gold-10);
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(74, 28, 36, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.7rem;
+        }
+
+        .modal-footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+        }
+
+        .modal-footer a {
+            color: var(--gold-10);
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-footer a:hover {
+            color: var(--maroon-30);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-line-wrapper">
+                <div class="loader-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="index.html" class="logo serif">Shagun <span>Ratna</span></a>
+        <ul class="nav-links">
+            <li><a href="index.html">Showroom</a></li>
+            <li><a href="#" style="color: var(--gold-10);">Catalog</a></li>
+            <li><a href="#">Loose Gems</a></li>
+            <li><a href="#">Our Heritage</a></li>
+        </ul>
+        <div class="nav-icons">
+            <span class="auth-links">
+                <a href="#" id="openLoginBtn">Login</a> /
+                <a href="#" id="openRegBtn">Register</a>
+            </span>
+            <i class="fas fa-search"></i>
+            <i class="far fa-heart"></i>
+            <i class="fas fa-shopping-bag"></i>
+        </div>
+    </nav>
+
+    <section class="catalog-hero">
+        <div class="catalog-hero-bg gs-parallax"></div>
+        <div class="catalog-hero-content">
+            <h1 class="serif gs-hero-text">The <i>Master</i> Catalog</h1>
+            <p class="gs-hero-text">Explore Our Finest Creations</p>
+        </div>
+    </section>
+
+    <section class="filter-section">
+        <ul class="filter-list">
+            <li><button class="filter-btn active">All Collections</button></li>
+            <li><button class="filter-btn">Rings</button></li>
+            <li><button class="filter-btn">Necklaces</button></li>
+            <li><button class="filter-btn">Earrings</button></li>
+            <li><button class="filter-btn">Bracelets</button></li>
+        </ul>
+    </section>
+
+    <section class="catalog-container">
+        <div class="product-grid">
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1605100804763-247f6612d544?q=80&w=600&auto=format&fit=crop"
+                        alt="Royal Solitaire">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">The Royal <i>Solitaire</i></h3>
+                    <p class="price">$4,500</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1599643478514-4a820cbf311e?q=80&w=600&auto=format&fit=crop"
+                        alt="Diamond Drop">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Imperial <i>Pendant</i></h3>
+                    <p class="price">$3,200</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=600&auto=format&fit=crop"
+                        alt="Emerald Earrings">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Emerald <i>Drops</i></h3>
+                    <p class="price">$2,800</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=600&auto=format&fit=crop"
+                        alt="Tennis Bracelet">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Classic <i>Tennis</i></h3>
+                    <p class="price">$5,100</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=600&auto=format&fit=crop"
+                        alt="Gold Cuff">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Aura <i>Cuff</i></h3>
+                    <p class="price">$1,850</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?q=80&w=600&auto=format&fit=crop"
+                        alt="Vintage Ring">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Estate <i>Ruby</i></h3>
+                    <p class="price">Price on Request</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1610427928236-4c4d5ab70b8a?q=80&w=600&auto=format&fit=crop"
+                        alt="Sapphire Ring">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Midnight <i>Sapphire</i></h3>
+                    <p class="price">$3,900</p>
+                </div>
+            </div>
+
+            <div class="product-card gs-product">
+                <div class="product-img">
+                    <img src="https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=600&auto=format&fit=crop"
+                        alt="Diamond Choker">
+                    <div class="quick-view">Quick View</div>
+                </div>
+                <div class="product-info">
+                    <h3 class="serif">Starlight <i>Collar</i></h3>
+                    <p class="price">$12,000</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-top">
+            <div class="footer-logo serif">Shagun <span>Ratna.</span></div>
+            <div class="footer-links">
+                <div class="link-column"><a href="#">Showroom</a><a href="#">Collections</a><a href="#">Bespoke</a>
+                </div>
+                <div class="link-column"><a href="#">About Us</a><a href="#">Our Ethics</a><a href="#">Contact</a></div>
+                <div class="link-column"><a href="#">Instagram</a><a href="#">Pinterest</a><a href="#">Facebook</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 Shagun Ratna Gemstones. All Rights Reserved.</div>
+    </footer>
+
+    <div class="modal-overlay" id="authOverlay">
+        <div class="modal-box" id="loginBox">
+            <i class="fas fa-times close-modal"></i>
+            <h2 class="serif">Welcome Back</h2>
+            <form>
+                <div class="form-group"><input type="email" placeholder="Email Address" required></div>
+                <div class="form-group"><input type="password" placeholder="Password" required></div>
+                <button type="button" class="btn btn-gold w-100">Sign In</button>
+                <div class="modal-footer">
+                    <p>Don't have an account? <a href="#" id="switchToReg">Register here</a></p>
+                </div>
+            </form>
+        </div>
+        <div class="modal-box" id="regBox" style="display: none;">
+            <i class="fas fa-times close-modal"></i>
+            <h2 class="serif">Join Shagun Ratna</h2>
+            <form>
+                <div class="form-group"><input type="text" placeholder="Full Name" required></div>
+                <div class="form-group"><input type="email" placeholder="Email Address" required></div>
+                <div class="form-group"><input type="password" placeholder="Create Password" required></div>
+                <button type="button" class="btn btn-gold w-100">Create Account</button>
+                <div class="modal-footer">
+                    <p>Already have an account? <a href="#" id="switchToLogin">Login here</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // 1. PRELOADER & HERO ANIMATION
+            const tlLoader = gsap.timeline({
+                onComplete: () => { document.getElementById('preloader').style.display = 'none'; }
+            });
+
+            tlLoader.to(".loader-line", { width: "100%", duration: 1.2, ease: "power2.inOut" })
+                .to(".loader-line-wrapper", { opacity: 0, duration: 0.5 })
+                .to("#preloader", { opacity: 0, duration: 0.8, ease: "power2.inOut" })
+                .fromTo(".gs-hero-text",
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=0.3"
+                );
+
+            // 2. NAV SCROLL
+            ScrollTrigger.create({
+                start: "top -80", end: 99999,
+                toggleClass: { className: "nav-scrolled", targets: "nav" }
+            });
+
+            // 3. HERO PARALLAX
+            gsap.to(".gs-parallax", {
+                yPercent: 30, ease: "none",
+                scrollTrigger: { trigger: ".catalog-hero", start: "top top", end: "bottom top", scrub: true }
+            });
+
+            // 4. PRODUCT GRID STAGGER ANIMATION
+            const products = gsap.utils.toArray('.gs-product');
+
+            // Initial reveal on scroll
+            ScrollTrigger.batch(products, {
+                onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power3.out" }),
+                start: "top 85%"
+            });
+
+            // 5. FILTER BUTTON LOGIC
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add to clicked
+                    btn.classList.add('active');
+
+                    // Simple refresh animation for visual feedback
+                    gsap.fromTo(products,
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.6, stagger: 0.05, ease: "power2.out", overwrite: true }
+                    );
+                });
+            });
+
+            // 6. MODALS LOGIC
+            const authOverlay = document.getElementById('authOverlay');
+            const loginBox = document.getElementById('loginBox');
+            const regBox = document.getElementById('regBox');
+
+            function openModal(boxToShow) {
+                authOverlay.style.display = 'flex';
+                loginBox.style.display = 'none'; regBox.style.display = 'none';
+                boxToShow.style.display = 'block';
+                gsap.fromTo(authOverlay, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+                gsap.fromTo(boxToShow, { scale: 0.9, y: 30, opacity: 0 }, { scale: 1, y: 0, opacity: 1, duration: 0.5, ease: "back.out(1.2)", delay: 0.1 });
+            }
+
+            function switchModal(boxToHide, boxToShow) {
+                gsap.to(boxToHide, {
+                    scale: 0.95, opacity: 0, duration: 0.3, onComplete: () => {
+                        boxToHide.style.display = 'none'; boxToShow.style.display = 'block';
+                        gsap.fromTo(boxToShow, { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "power2.out" });
+                    }
+                });
+            }
+
+            function closeModal() {
+                gsap.to([loginBox, regBox], { scale: 0.95, y: 20, opacity: 0, duration: 0.3 });
+                gsap.to(authOverlay, { opacity: 0, duration: 0.3, delay: 0.1, onComplete: () => { authOverlay.style.display = 'none'; } });
+            }
+
+            document.getElementById('openLoginBtn').addEventListener('click', (e) => { e.preventDefault(); openModal(loginBox); });
+            document.getElementById('openRegBtn').addEventListener('click', (e) => { e.preventDefault(); openModal(regBox); });
+            document.getElementById('switchToReg').addEventListener('click', (e) => { e.preventDefault(); switchModal(loginBox, regBox); });
+            document.getElementById('switchToLogin').addEventListener('click', (e) => { e.preventDefault(); switchModal(regBox, loginBox); });
+            document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', closeModal));
+            authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) closeModal(); });
+        });
+    </script>
+</body>
+
+</html>

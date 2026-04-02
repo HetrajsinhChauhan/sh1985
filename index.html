@@ -18,14 +18,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
     <style>
-        /* --- UPDATED PREMIUM COLOR PALETTE --- */
+        /* --- PREMIUM COLOR PALETTE --- */
         :root {
             --beige-60: #F9F6F0;
-            /* Cleaner, luxurious Alabaster */
             --maroon-30: #4A1C24;
-            /* Deeper, richer Burgundy */
             --gold-10: #C5A059;
-            /* Refined Champagne Gold */
             --white: #FFFFFF;
             --black: #0A0A0A;
         }
@@ -52,7 +49,6 @@
             font-family: 'Playfair Display', serif;
         }
 
-        /* Elegant Italics for Headers */
         h1 i,
         h2 i,
         .serif i {
@@ -274,27 +270,13 @@
             text-align: center;
         }
 
-        /* =========================================================
-           --- NEW EDITORIAL HERO SLIDER --- 
-           ========================================================= */
+        /* --- CENTERED HERO SLIDER --- */
         .hero {
             position: relative;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
             background-color: var(--black);
-        }
-
-        /* Elegant Thin Frame Inside Hero */
-        .hero-frame {
-            position: absolute;
-            inset: 1.5rem;
-            border: 1px solid rgba(197, 160, 89, 0.25);
-            /* Subtle gold */
-            pointer-events: none;
-            z-index: 15;
-            border-bottom: none;
-            /* Let the bottom breathe */
         }
 
         .slide {
@@ -329,118 +311,98 @@
             background-size: cover;
             background-position: center;
             transform: scale(1.1);
-            /* Starts zoomed in for Ken Burns effect */
         }
 
-        /* Rich Premium Gradient Overlay */
         .hero-img::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, rgba(74, 28, 36, 0.3) 50%, rgba(10, 10, 10, 0.4) 100%);
+            background: rgba(0, 0, 0, 0.5);
         }
 
-        /* Asymmetrical Editorial Layout */
-        .hero-content-editorial {
+        .hero-content-centered {
             position: absolute;
-            bottom: 8%;
-            left: 4rem;
-            right: 4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
             z-index: 20;
-            color: var(--beige-60);
-        }
-
-        /* Title Wrapping for Mask Reveal */
-        .hero-title-wrapper {
-            overflow: hidden;
-            padding-bottom: 10px;
+            color: var(--white);
+            width: 100%;
+            padding: 0 20px;
         }
 
         .gs-hero-title {
-            font-size: 7vw;
-            font-weight: 300;
-            line-height: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transform: translateY(100%);
-            /* Hidden state for GSAP */
-        }
-
-        .hero-meta {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 1.5rem;
+            font-size: 4.5rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            opacity: 0;
         }
 
         .gs-hero-sub {
-            font-size: 0.8rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--gold-10);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 2.5rem;
+            opacity: 0;
         }
 
-        /* Elegant Text Button */
-        .btn-text {
-            color: var(--white);
+        .btn-outline-light {
+            display: inline-block;
+            padding: 1rem 3rem;
             text-decoration: none;
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: color 0.3s;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            color: var(--white);
+            opacity: 0;
         }
 
-        .btn-text i {
-            font-size: 1rem;
-            color: var(--gold-10);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-text:hover {
-            color: var(--gold-10);
-        }
-
-        .btn-text:hover i {
-            transform: translateX(10px);
+        .btn-outline-light:hover {
+            background: var(--white);
+            color: var(--black);
         }
 
         .slider-arrows {
             position: absolute;
-            bottom: 8%;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 50%;
+            left: 0;
+            width: 100%;
+            transform: translateY(-50%);
             display: flex;
-            gap: 2rem;
+            justify-content: space-between;
+            padding: 0 4rem;
             z-index: 20;
+            pointer-events: none;
         }
 
         .slider-arrow {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--white);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             cursor: pointer;
+            pointer-events: auto;
             transition: all 0.4s ease;
             backdrop-filter: blur(5px);
         }
 
         .slider-arrow:hover {
-            background: var(--gold-10);
-            border-color: var(--gold-10);
+            background: var(--white);
+            border-color: var(--white);
             color: var(--black);
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         /* --- Login / Register Modals --- */
@@ -535,7 +497,7 @@
             color: var(--maroon-30);
         }
 
-        /* --- Section 1: Clean Editorial Categories --- */
+        /* --- Existing Sections --- */
         .editorial-intro {
             display: flex;
             padding: 8rem 4rem;
@@ -608,7 +570,6 @@
             object-fit: cover;
         }
 
-        /* --- Section 2: Diamond Layout / Showroom --- */
         .diamond-section {
             padding: 8rem 4rem;
             background: var(--beige-60);
@@ -685,7 +646,9 @@
             grid-row: 2;
         }
 
-        /* --- NEW SECTION: Horizontal Scroll Showcase --- */
+        /* =========================================================
+           --- UPDATED HORIZONTAL SHOWCASE HEADER --- 
+           ========================================================= */
         .horizontal-showcase {
             background: var(--maroon-30);
             color: var(--beige-60);
@@ -699,23 +662,46 @@
         }
 
         .hs-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 6rem;
             padding: 0 4rem;
         }
 
+        /* New Gold Line Decoration */
+        .hs-line {
+            width: 1px;
+            height: 80px;
+            background-color: var(--gold-10);
+            margin-bottom: 2rem;
+            transform-origin: top;
+        }
+
+        /* Wrappers for Mask Reveal Animation */
+        .hs-title-wrapper,
+        .hs-sub-wrapper {
+            overflow: hidden;
+            padding-bottom: 5px;
+            /* Prevent cutting off descenders */
+        }
+
         .hs-header h2 {
-            font-size: 4rem;
+            font-size: 5.5rem;
             color: var(--gold-10);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 8px;
+            line-height: 1;
         }
 
         .hs-header p {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
+            font-size: 1rem;
+            letter-spacing: 5px;
             text-transform: uppercase;
+            color: var(--beige-60);
+            font-weight: 300;
         }
 
         .hs-container {
@@ -773,7 +759,6 @@
             letter-spacing: 2px;
         }
 
-        /* --- NEW SECTION: Masonry Categories --- */
         .masonry-section {
             padding: 10rem 4rem;
             background: var(--beige-60);
@@ -858,7 +843,6 @@
             transform: translateY(0);
         }
 
-        /* --- Section 3: Heritage Storytelling --- */
         .heritage-section {
             padding: 10rem 4rem;
             background: var(--white);
@@ -932,7 +916,6 @@
             padding-left: 1.5rem;
         }
 
-        /* --- Section 4: Parallax Banner --- */
         .parallax-banner {
             position: relative;
             width: 100vw;
@@ -979,7 +962,6 @@
             text-transform: uppercase;
         }
 
-        /* --- Section 5: Timeline / Anatomy Layout --- */
         .anatomy-section {
             background: var(--white);
             padding: 10rem 4rem;
@@ -1069,7 +1051,6 @@
             font-family: 'Playfair Display', serif;
         }
 
-        /* --- Section 6: Structured Services Grid --- */
         .services-section {
             padding: 8rem 4rem;
             background-color: var(--maroon-30);
@@ -1129,7 +1110,6 @@
             margin-bottom: 2rem;
         }
 
-        /* --- Section 7: Testimonials --- */
         .testimonial-section {
             padding: 8rem 4rem;
             background: var(--beige-60);
@@ -1188,7 +1168,6 @@
             letter-spacing: 1px;
         }
 
-        /* --- Footer --- */
         footer {
             background-color: var(--white);
             padding: 6rem 4rem 2rem 4rem;
@@ -1264,7 +1243,7 @@
         <a href="#" class="logo serif">Shagun <span>Ratna</span></a>
         <ul class="nav-links">
             <li><a href="#">Showroom</a></li>
-            <li><a href="#">High Jewelry</a></li>
+            <li><a href="catalog.html">Catalog</a></li>
             <li><a href="#">Loose Gems</a></li>
             <li><a href="#">Our Heritage</a></li>
         </ul>
@@ -1280,57 +1259,40 @@
     </nav>
 
     <section class="hero" id="heroSlider">
-        <div class="hero-frame"></div>
         <div class="slide slide-active">
             <div class="hero-img-wrap">
                 <div class="hero-img"
                     style="background-image: url('https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?q=80&w=1920&auto=format&fit=crop');">
                 </div>
             </div>
-            <div class="hero-content-editorial">
-                <div class="hero-title-wrapper">
-                    <h1 class="gs-hero-title serif">Rare<br><i>Elegance</i></h1>
-                </div>
-                <div class="hero-meta">
-                    <p class="gs-hero-sub">The 2026 Gemstone Collection</p>
-                    <a href="#" class="btn-text gs-hero-btn">Enter Vault <i class="fas fa-long-arrow-alt-right"></i></a>
-                </div>
+            <div class="hero-content-centered">
+                <h1 class="gs-hero-title serif">Discover Timeless<br>Elegance</h1>
+                <p class="gs-hero-sub">Featuring bold and beautiful designs</p>
+                <a href="#" class="btn-outline-light gs-hero-btn">Shop Now</a>
             </div>
         </div>
-
         <div class="slide">
             <div class="hero-img-wrap">
                 <div class="hero-img"
                     style="background-image: url('https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=1920&auto=format&fit=crop');">
                 </div>
             </div>
-            <div class="hero-content-editorial">
-                <div class="hero-title-wrapper">
-                    <h1 class="gs-hero-title serif">Eternal<br><i>Craft</i></h1>
-                </div>
-                <div class="hero-meta">
-                    <p class="gs-hero-sub">Masterpieces of Nature</p>
-                    <a href="#" class="btn-text gs-hero-btn">Discover More <i
-                            class="fas fa-long-arrow-alt-right"></i></a>
-                </div>
+            <div class="hero-content-centered">
+                <h1 class="gs-hero-title serif">Masterpieces of<br>Nature</h1>
+                <p class="gs-hero-sub">Ethically sourced, flawlessly cut</p>
+                <a href="#" class="btn-outline-light gs-hero-btn">Shop Now</a>
             </div>
         </div>
-
         <div class="slide">
             <div class="hero-img-wrap">
                 <div class="hero-img"
                     style="background-image: url('https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=1920&auto=format&fit=crop');">
                 </div>
             </div>
-            <div class="hero-content-editorial">
-                <div class="hero-title-wrapper">
-                    <h1 class="gs-hero-title serif">Flawless<br><i>Cuts</i></h1>
-                </div>
-                <div class="hero-meta">
-                    <p class="gs-hero-sub">Ethically Sourced Diamonds</p>
-                    <a href="#" class="btn-text gs-hero-btn">View Showroom <i
-                            class="fas fa-long-arrow-alt-right"></i></a>
-                </div>
+            <div class="hero-content-centered">
+                <h1 class="gs-hero-title serif">Uncompromising<br>Brilliance</h1>
+                <p class="gs-hero-sub">Experience the pinnacle of high jewelry</p>
+                <a href="#" class="btn-outline-light gs-hero-btn">Shop Now</a>
             </div>
         </div>
 
@@ -1381,11 +1343,18 @@
         </div>
     </section>
 
-    <section class="horizontal-showcase" id="horizontalShowcase">
+    <!-- <section class="horizontal-showcase" id="horizontalShowcase">
+
         <div class="hs-header">
-            <h2 class="serif gs-rev">The Master <i>Collection</i></h2>
-            <p class="gs-rev">Scroll to explore our finest creations</p>
+            <div class="hs-line"></div>
+            <div class="hs-title-wrapper">
+                <h2 class="serif hs-title">The Master <i>Collection</i></h2>
+            </div>
+            <div class="hs-sub-wrapper">
+                <p class="hs-sub">Scroll to explore our finest creations</p>
+            </div>
         </div>
+
         <div class="hs-container">
             <div class="hs-wrapper" id="hsWrapper">
                 <div class="hs-item"><img
@@ -1430,7 +1399,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <section class="masonry-section">
         <div class="masonry-header">
@@ -1631,27 +1600,20 @@
             gsap.registerPlugin(ScrollTrigger);
 
             // --- 1. PRELOADER & CINEMATIC TEXT ANIMATION ---
-
             const tlLoader = gsap.timeline({
                 onComplete: () => {
                     document.getElementById('preloader').style.display = 'none';
-                    // Start first slide Ken Burns immediately after load
                     gsap.to(".slide-active .hero-img", { scale: 1, duration: 6, ease: "power1.out" });
                 }
             });
 
-            // 1. Cinematic reveal of the large text
             tlLoader.fromTo("#cinematic-text",
                 { opacity: 0, scale: 0.8, filter: "blur(20px)" },
                 { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power4.out" }
             )
-                // 2. Load the line
                 .to(".loader-line", { width: "100%", duration: 1.5, ease: "power2.inOut" }, "-=1")
-                // 3. Fade out the loader line wrapper
                 .to(".loader-line-wrapper", { opacity: 0, duration: 0.5 })
-                // 4. Fade out the background to reveal the hero section
                 .to("#preloader", { opacity: 0, duration: 0.8, ease: "power2.inOut" })
-                // 5. Fly the massive text into the top left corner to become the logo
                 .to("#cinematic-text", {
                     top: "2.8rem",
                     left: "4rem",
@@ -1663,20 +1625,17 @@
                     duration: 1.5,
                     ease: "power4.inOut",
                     onComplete: () => {
-                        // Swap cinematic text for the actual logo in the DOM
                         document.querySelector('.logo').style.opacity = 1;
                         document.getElementById('cinematic-text').style.display = 'none';
                     }
                 }, "-=0.8")
-                // 6. Mask Reveal the Hero Title
                 .fromTo(".slide-active .gs-hero-title",
-                    { yPercent: 100 },
-                    { yPercent: 0, duration: 1.5, ease: "expo.out" }, "-=1"
+                    { y: 40, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" }, "-=1"
                 )
-                // 7. Fade in subtext and button
                 .fromTo(".slide-active .gs-hero-sub, .slide-active .gs-hero-btn",
                     { opacity: 0, y: 20 },
-                    { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=1"
+                    { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=0.8"
                 );
 
 
@@ -1688,7 +1647,7 @@
             });
 
 
-            // --- 3. Hero Image Slider Logic (Updated for Editorial Animations) ---
+            // --- 3. Centered Hero Image Slider Logic ---
             const slides = document.querySelectorAll('.slide');
             let currentSlide = 0;
             let isAnimating = false;
@@ -1705,8 +1664,7 @@
                     onComplete: () => {
                         outSlide.classList.remove('slide-active');
                         inSlide.classList.add('slide-active');
-                        // Reset outSlide elements
-                        gsap.set(outSlide.querySelector('.gs-hero-title'), { yPercent: 100 });
+                        gsap.set(outSlide.querySelector('.gs-hero-title'), { y: 40, opacity: 0 });
                         gsap.set(outSlide.querySelectorAll('.gs-hero-sub, .gs-hero-btn'), { opacity: 0, y: 20 });
                         gsap.set(outSlide.querySelector('.hero-img'), { scale: 1.1 });
                         isAnimating = false;
@@ -1715,15 +1673,11 @@
 
                 tl.set(inSlide, { zIndex: 1, autoAlpha: 1 })
                     .set(outSlide, { zIndex: 2 })
-                    // Crossfade
                     .to(outSlide, { autoAlpha: 0, duration: 1.2, ease: "power2.inOut" })
-                    // Start Ken burns on incoming image
                     .to(inSlide.querySelector('.hero-img'), { scale: 1, duration: 6, ease: "power1.out" }, 0)
-                    // Mask Reveal Title
                     .fromTo(inSlide.querySelector('.gs-hero-title'),
-                        { yPercent: 100 },
-                        { yPercent: 0, duration: 1.5, ease: "expo.out" }, "-=0.8")
-                    // Fade Sub and Btn
+                        { y: 40, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 1.2, ease: "power3.out" }, "-=0.8")
                     .fromTo(inSlide.querySelectorAll('.gs-hero-sub, .gs-hero-btn'),
                         { opacity: 0, y: 20 },
                         { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=1");
@@ -1796,6 +1750,20 @@
             }
 
             // --- 6. ScrollTrigger Animations (Reverse on Scroll Up) ---
+
+            // UPDATED THE MASTER COLLECTION HEADER REVEAL ANIMATION
+            const tlHsHeader = gsap.timeline({
+                scrollTrigger: {
+                    trigger: ".horizontal-showcase",
+                    start: "top 75%",
+                    toggleActions: "play reverse play reverse"
+                }
+            });
+
+            tlHsHeader.fromTo(".hs-line", { scaleY: 0 }, { scaleY: 1, duration: 1, ease: "expo.inOut" })
+                .fromTo(".hs-title", { yPercent: 100 }, { yPercent: 0, duration: 1.2, ease: "expo.out" }, "-=0.4")
+                .fromTo(".hs-sub", { yPercent: 100, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=0.8");
+
 
             gsap.from(".gs-m-item", {
                 scrollTrigger: {
